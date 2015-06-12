@@ -1,0 +1,9 @@
+Description:
+    Creates a new AngularJS entity.
+    Docs: http://docs.angularjs.org/guide/dev_guide.services.creating_services
+
+Example:
+    yo xrm:client-angular thing
+
+    This will create:
+        app/scripts/thing.js

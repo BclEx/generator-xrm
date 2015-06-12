@@ -1,0 +1,8 @@
+Description:
+    Creates a new Database entity.
+
+Example:
+    yo xrm:database thing
+
+    This will create:
+        sql/thing.sql

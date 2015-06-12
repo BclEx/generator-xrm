@@ -1,0 +1,11 @@
+Description:
+    Creates a new postCSS fragment.
+
+Example:
+    yo fragment thing
+
+    This will create:
+        ./thing.css
+        ./thing.html
+        ./thing.js
+        ./thing.sql

@@ -1,0 +1,8 @@
+Description:
+    Creates a new Database fragment.
+
+Example:
+    yo fragment:knex thing
+
+    This will create:
+        ./thing.sql
