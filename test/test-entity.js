@@ -14,7 +14,7 @@ describe('fragment generator load test', function () {
     'skip-message': true
   };
 
-  describe('database endpoint reached', function () {
+  describe('entity test', function () {
     before(function (done) {
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
@@ -26,23 +26,18 @@ describe('fragment generator load test', function () {
         done();
       });
     });
+    
+    //
     it('can be loaded by object', function (done) {
       xrm.options.args = {
-        fields: [
-        {
-          label: 'Name',
+        label: 'Object',
+        plural: 'Objects',
+        description: 'Description',
+        fields: [{
+          label: 'Object Name',
           name: 'Name',
           required: true,
-          text: { maxlength: 150 }
-        }, {
-          label: 'Category',
-          name: 'Category',
-          required: true,
-          picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
-        }, {
-          label: 'Metadata',
-          name: 'Metadata',
-          memo: { maxlength: 2000 }
+          text: { length: 80 }
         }]
       };
       xrm.run({}, function () {

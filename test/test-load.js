@@ -1,21 +1,20 @@
 'use strict';
 
-var path = require('path');
 var fs = require('fs');
+var path = require('path');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
-describe('fragment generator load test', function () {
+describe('xrm generator load test', function () {
 
   it('can be imported without blowing up', function () {
     assert(require('../app') !== undefined);
-    assert(require('../css') !== undefined);
-    assert(require('../html') !== undefined);
-    assert(require('../js') !== undefined);
-    assert(require('../knex') !== undefined);
+    assert(require('../client-angular') !== undefined);
+    assert(require('../database') !== undefined);
+    assert(require('../server-aspnet') !== undefined);
   });
 
-  var angular, genOptions = {
+  var xrm, genOptions = {
     'appPath': 'app',
     'skip-install': true,
     'skip-welcome-message': true,
@@ -33,18 +32,18 @@ describe('fragment generator load test', function () {
 	key: "value0",\
 	func: function () { return "value1"; } \
 }', 'utf8');
-        angular = helpers.createGenerator('fragment:app', [
+        xrm = helpers.createGenerator('xrm:app', [
            '../app'
         ], ['name-x'], genOptions);
         done();
       });
     });
     it('can be loaded by name', function (done) {
-      angular.run({}, function () {
-        assert(this.options.ctx.key == 'value0');
-        assert(this.options.ctx.func() == 'value1');
+      xrm.run({}, function () {
+        assert(this.options.args.key == 'value0');
+        assert(this.options.args.func() == 'value1');
         done();
-      }.bind(angular));
+      }.bind(xrm));
     });
   });
 
@@ -54,7 +53,7 @@ describe('fragment generator load test', function () {
         if (err) {
           done(err);
         }
-        angular = helpers.createGenerator('fragment:app', [
+        xrm = helpers.createGenerator('fragment:app', [
            '../app'
         ], [{
           key: "value0",
@@ -64,11 +63,11 @@ describe('fragment generator load test', function () {
       });
     });
     it('can be loaded by object', function (done) {
-      angular.run({}, function () {
-        assert(this.options.ctx.key == 'value0');
-        assert(this.options.ctx.func() == 'value1');
+      xrm.run({}, function () {
+        assert(this.options.args.key == 'value0');
+        assert(this.options.args.func() == 'value1');
         done();
-      }.bind(angular));
+      }.bind(xrm));
     });
   });
 

@@ -10,6 +10,3 @@ var Generator = module.exports = function Generator() {
 };
 
 util.inherits(Generator, yeoman.generators.NamedBase);
-
-Generator.prototype.generateSourceAndTest = function (appTemplate, testTemplate, targetDirectory, skipAdd) {
-};
