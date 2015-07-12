@@ -16,12 +16,17 @@ describe('fragment generator load test', function () {
 
   describe('database endpoint reached', function () {
     before(function (done) {
+      var deps = [
+        [helpers.createDummyGenerator(), 'fragment:sql']
+      ];
+
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
         }
         xrm = helpers.createGenerator('xrm:database', [
-           '../database'
+          '../database',
+          '../generator-fragment'
         ], [null], genOptions);
         done();
       });
@@ -29,21 +34,21 @@ describe('fragment generator load test', function () {
     it('can be loaded by object', function (done) {
       xrm.options.args = {
         fields: [
-        {
-          label: 'Name',
-          name: 'Name',
-          required: true,
-          text: { maxlength: 150 }
-        }, {
-          label: 'Category',
-          name: 'Category',
-          required: true,
-          picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
-        }, {
-          label: 'Metadata',
-          name: 'Metadata',
-          memo: { maxlength: 2000 }
-        }]
+          {
+            label: 'Name',
+            name: 'Name',
+            required: true,
+            text: { maxlength: 150 }
+          }, {
+            label: 'Category',
+            name: 'Category',
+            required: true,
+            picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
+          }, {
+            label: 'Metadata',
+            name: 'Metadata',
+            memo: { maxlength: 2000 }
+          }]
       };
       xrm.run({}, function () {
         done();

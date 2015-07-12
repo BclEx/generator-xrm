@@ -11,8 +11,10 @@
 // External libs.
 var util = require('util');
 var scriptBase = require('../script-base.js');
+var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var _ = require('lodash');
+var bla = require('generator-fragment');
 
 var Generator = module.exports = function Generator() {
   scriptBase.apply(this, arguments);
@@ -21,7 +23,7 @@ var Generator = module.exports = function Generator() {
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles(args) {
-  this.log(chalk.green('Building sql...'));
+  this.log(chalk.green('Define sql...'));
   args = args || this.options.args;
 
   // test args
@@ -65,7 +67,14 @@ Generator.prototype.createFiles = function createFiles(args) {
       this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
     }
   });
-  return { createTable: entityName, t: t };
+  var subArgs = { createTable: entityName, t: t };
+
+  //this.options.args = subArgs;
+  this.composeWith('fragment:sql', subArgs, {
+    //local: require.resolve('generator-fragment')
+  });
+
+  return null;
 };
 
 // Generator.prototype.createFiles2 = function createFiles2() {

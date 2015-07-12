@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
+        <title></title>
+    </head>
+    
+    <body layout="column" ng-app="myapp" ng-controller="appController as app">
+        <md-toolbar layout="row">
+            <div class="md-toolbar-tools">
+                <span>Sample</span>
+                <span flex></span>
+            </div>
+        </md-toolbar>
+        <div flex layout="row">
+            <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2">
+                <md-content flex role="navigation" ng-controller="dataController as data">
+                    <a ng-link="galleries()">Galleries</a>
+                    <ul ng-if="data.galleries.length > 0">
+                        <li ng-repeat="gallery in data.galleries">
+                            <a ng-link="gallery({ id: $index })">{{ gallery.title }}</a>
+                        </li>
+                    </ul>
+                </md-content>
+            </md-sidenav>
+            <md-content flex class="md-padding">
+                <ng-viewport></ng-viewport>
+            </md-content>
+        </div>
+        <script src="bower_components/lodash/lodash.min.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-animate/angular-animate.js"></script>
+        <script src="bower_components/angular-aria/angular-aria.js"></script>
+        <script src="bower_components/angular-material/angular-material.js"></script>
+        <script src="bower_components/router.es5.js"></script>
+        <script src="controllers/appController.js"></script>
+        <script src="controllers/dataController.js"></script>
+        <script src="components/galleries/galleries.js"></script>
+        <script src="components/gallery/gallery.js"></script>
+    </body>
+
+</html>
