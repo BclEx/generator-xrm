@@ -5,7 +5,7 @@ var path = require('path');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
-describe('fragment generator load test', function () {
+describe('fragment generator load test.', function () {
 
   var xrm, genOptions = {
     'appPath': 'app',
@@ -14,7 +14,7 @@ describe('fragment generator load test', function () {
     'skip-message': true
   };
 
-  describe('database endpoint reached', function () {
+  describe('database endpoint reached.', function () {
     before(function (done) {
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
@@ -22,13 +22,13 @@ describe('fragment generator load test', function () {
         }
         xrm = helpers.createGenerator('xrm:database', [
            '../database'
-        ], [null], genOptions);
+        ], [], genOptions);
         done();
       });
     });
     
     //
-    it('can be loaded by object', function (done) {
+    it('can be loaded by object.', function (done) {
       xrm.options.args = {
         fields: [
         {
@@ -91,7 +91,7 @@ describe('fragment generator load test', function () {
           memo: { maxlength: 2000 }
         }]
       };
-      xrm.run({}, function () {
+      xrm.run(function () {
         done();
       }.bind(xrm));
     });

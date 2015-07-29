@@ -3,6 +3,7 @@
 module.exports = function (grunt) {
 
   require('load-grunt-tasks')(grunt);
+  grunt.loadNpmTasks('grunt-xrm');
 
   // Configurable paths for the application
   var appConfig = {
@@ -32,6 +33,10 @@ module.exports = function (grunt) {
       },
       gruntfile: {
         files: ['Gruntfile.js']
+      },
+      xrm: {
+        files: ['<%= yeoman.app %>/xrm/{,*/}*.json'],
+        tasks: ['xrm'],
       },
       livereload: {
         options: {
@@ -152,6 +157,16 @@ module.exports = function (grunt) {
         src: '{,*/}*.css'
       }
     },
+    
+    // xrm builder
+    xrm: {
+      main: {
+        expand: true,
+        cwd: '<%= yeoman.app %>',
+        dest: '.',
+        src: 'xrm/{,*/}*.json'
+      }
+    },
 
   });
 
@@ -163,7 +178,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       'clean:server',
       'autoprefixer:server',
-      //'copy:dist',
+    //'copy:dist',
       'connect:livereload',
       'watch'
     ]);

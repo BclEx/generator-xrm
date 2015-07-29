@@ -5,13 +5,13 @@ var path = require('path');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
-describe('xrm generator load test', function () {
+describe('xrm generator load test.', function () {
 
-  it('can be imported without blowing up', function () {
+  it('can be imported without blowing up.', function () {
     assert(require('../app') !== undefined);
-    assert(require('../client-angular') !== undefined);
+    //assert(require('../client-angular') !== undefined);
     assert(require('../database') !== undefined);
-    assert(require('../server-aspnet') !== undefined);
+    //assert(require('../server-aspnet') !== undefined);
   });
 
   var xrm, genOptions = {
@@ -21,7 +21,7 @@ describe('xrm generator load test', function () {
     'skip-message': true
   };
 
-  describe('load context by name', function () {
+  describe('load context by name.', function () {
     before(function (done) {
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
@@ -38,8 +38,8 @@ describe('xrm generator load test', function () {
         done();
       });
     });
-    it('can be loaded by name', function (done) {
-      xrm.run({}, function () {
+    it('can be loaded by name.', function (done) {
+      xrm.run(function () {
         assert(this.options.args.key == 'value0');
         assert(this.options.args.func() == 'value1');
         done();
@@ -47,13 +47,13 @@ describe('xrm generator load test', function () {
     });
   });
 
-  describe('load context by object', function () {
+  describe('load context by object.', function () {
     before(function (done) {
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('fragment:app', [
+        xrm = helpers.createGenerator('xrm:app', [
            '../app'
         ], [{
           key: "value0",
@@ -62,8 +62,8 @@ describe('xrm generator load test', function () {
         done();
       });
     });
-    it('can be loaded by object', function (done) {
-      xrm.run({}, function () {
+    it('can be loaded by object.', function (done) {
+      xrm.run(function () {
         assert(this.options.args.key == 'value0');
         assert(this.options.args.func() == 'value1');
         done();

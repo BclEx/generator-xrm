@@ -14,7 +14,6 @@ var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var _ = require('lodash');
-var bla = require('generator-fragment');
 
 var Generator = module.exports = function Generator() {
   scriptBase.apply(this, arguments);
@@ -69,10 +68,7 @@ Generator.prototype.createFiles = function createFiles(args) {
   });
   var subArgs = { createTable: entityName, t: t };
 
-  //this.options.args = subArgs;
-  this.composeWith('fragment:sql', subArgs, {
-    //local: require.resolve('generator-fragment')
-  });
+  this.composeWith('fragment:sql', { ctx: subArgs});
 
   return null;
 };

@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var yeoman = require('yeoman-generator');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
@@ -14,24 +15,31 @@ describe('fragment generator load test', function () {
     'skip-message': true
   };
 
-  describe('database endpoint reached', function () {
+  var createDummyGenerator = function () {
+    return yeoman.generators.Base.extend({
+      test: function () {
+        // console.log(this.options);
+        // xrm.subArgs = this.options.args;
+      }
+    });
+  };
+
+  describe('database endpoint reached.', function () {
     before(function (done) {
       var deps = [
-        [helpers.createDummyGenerator(), 'fragment:sql']
+        '../database',
+        [createDummyGenerator(), 'fragment:sql']
       ];
 
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm:database', [
-          '../database',
-          '../generator-fragment'
-        ], [null], genOptions);
+        xrm = helpers.createGenerator('xrm:database', deps, [], genOptions);
         done();
       });
     });
-    it('can be loaded by object', function (done) {
+    it('can be loaded by object.', function (done) {
       xrm.options.args = {
         fields: [
           {
@@ -50,7 +58,10 @@ describe('fragment generator load test', function () {
             memo: { maxlength: 2000 }
           }]
       };
-      xrm.run({}, function () {
+      xrm.run(function () {
+        // var subArgs = this.subArgs;
+        // assert(subArgs.createTable == '');
+        // assert(Array.isArray(subArgs.t));
         done();
       }.bind(xrm));
     });

@@ -1,0 +1,10 @@
+{
+  "label": "User",
+  "plural": "Users",
+  "description": "description for users",
+  "fields": [{
+    "label": "Name",
+    "name": "Name",
+    "text": { "length": 100 }
+  }]
+}
