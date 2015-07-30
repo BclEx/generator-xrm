@@ -40,8 +40,8 @@ describe('xrm generator load test.', function () {
     });
     it('can be loaded by name.', function (done) {
       xrm.run(function () {
-        assert(this.options.args.key == 'value0');
-        assert(this.options.args.func() == 'value1');
+        assert(this.options.ctx.key == 'value0');
+        assert(this.options.ctx.func() == 'value1');
         done();
       }.bind(xrm));
     });
@@ -64,8 +64,8 @@ describe('xrm generator load test.', function () {
     });
     it('can be loaded by object.', function (done) {
       xrm.run(function () {
-        assert(this.options.args.key == 'value0');
-        assert(this.options.args.func() == 'value1');
+        assert(this.options.ctx.key == 'value0');
+        assert(this.options.ctx.func() == 'value1');
         done();
       }.bind(xrm));
     });

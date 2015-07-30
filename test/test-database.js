@@ -18,8 +18,7 @@ describe('fragment generator load test', function () {
   var createDummyGenerator = function () {
     return yeoman.generators.Base.extend({
       test: function () {
-        // console.log(this.options);
-        // xrm.subArgs = this.options.args;
+        xrm.ctx = this.options.ctx;
       }
     });
   };
@@ -40,7 +39,8 @@ describe('fragment generator load test', function () {
       });
     });
     it('can be loaded by object.', function (done) {
-      xrm.options.args = {
+      xrm.options.ctx = {
+        name: 'test',
         fields: [
           {
             label: 'Name',
@@ -59,9 +59,19 @@ describe('fragment generator load test', function () {
           }]
       };
       xrm.run(function () {
-        // var subArgs = this.subArgs;
-        // assert(subArgs.createTable == '');
-        // assert(Array.isArray(subArgs.t));
+        //console.log(this.ctx);
+        assert(this.ctx.createTable == 'test');
+        assert(Array.isArray(this.ctx.t));
+        var t = this.ctx.t;
+        //console.log(t[0]);
+        assert(t[0].uuid.name == 'testId');
+        assert(t[1].datetime.name == 'CreateOn');
+        assert(t[2].uuid.name == 'CreateBy');
+        assert(t[3].datetime.name == 'ModifyOn');
+        assert(t[4].uuid.name == 'ModifyBy');
+        assert(t[5].string.name == 'Name');
+        assert(t[6].string.name == 'Category');
+        assert(t[7].string.name == 'Metadata');
         done();
       }.bind(xrm));
     });

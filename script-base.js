@@ -8,18 +8,18 @@ var chalk = require('chalk');
 var Generator = module.exports = function Generator() {
   var a = arguments[0];
   // parse args/file
-  var args = {};
+  var ctx = {};
   if (typeof a[0] != 'string') {
-    args = a[0] || {};
+    ctx = a[0] || {};
     arguments[0].shift();
   } else {
     try {
       var filePath = path.join(process.cwd(), a[0] + '.json');
-      args = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0];
+      ctx = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0];
     } catch (e) { this.log(chalk.bold(e)); }
   }
   yeoman.generators.Base.apply(this, arguments);
-  this.options.args = args;
+  this.options.ctx = ctx;
 };
 
 util.inherits(Generator, yeoman.generators.NamedBase);

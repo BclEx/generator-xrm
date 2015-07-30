@@ -21,13 +21,13 @@ var Generator = module.exports = function Generator() {
 
 util.inherits(Generator, scriptBase);
 
-Generator.prototype.createFiles = function createFiles(args) {
-  this.log(chalk.green('Define sql...'));
-  args = args || this.options.args;
+Generator.prototype.createFiles = function createFiles() {
+  this.log(chalk.green('define sql...'));
+  var ctx = this.options.ctx;
 
-  // test args
-  var entityName = args.name || 'entity';
-  var fields = args.fields;
+  // test ctx
+  var entityName = ctx.name || 'entity';
+  var fields = ctx.fields;
   if (!Array.isArray(fields)) {
     this.log(chalk.red('ERR! { fields: not array }')); return null;
   }
@@ -66,9 +66,9 @@ Generator.prototype.createFiles = function createFiles(args) {
       this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
     }
   });
-  var subArgs = { createTable: entityName, t: t };
 
-  this.composeWith('fragment:sql', { ctx: subArgs});
+  var opts = { ctx: { createTable: entityName, t: t } };
+  this.composeWith('fragment:sql', { options: opts });
 
   return null;
 };
