@@ -69,8 +69,6 @@ Generator.prototype.createFiles = function createFiles() {
 
   var opts = { ctx: { createTable: entityName, t: t } };
   this.composeWith('fragment:sql', { options: opts });
-
-  return null;
 };
 
 // Generator.prototype.createFiles2 = function createFiles2() {

@@ -29,7 +29,7 @@ describe('fragment generator load test.', function () {
     
     //
     it('can be loaded by object.', function (done) {
-      xrm.options.args = {
+      xrm.options.ctx = {
         fields: [
         {
           label: 'Auto Number',

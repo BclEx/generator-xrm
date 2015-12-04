@@ -9,8 +9,11 @@ var Generator = module.exports = function Generator() {
   var a = arguments[0];
   // parse args/file
   var ctx = {};
+  var dest = {};
   if (typeof a[0] != 'string') {
     ctx = a[0] || {};
+    dest = a[1] || {};
+    arguments[0].shift();
     arguments[0].shift();
   } else {
     try {
@@ -20,6 +23,8 @@ var Generator = module.exports = function Generator() {
   }
   yeoman.generators.Base.apply(this, arguments);
   this.options.ctx = ctx;
+  this.options.dest = dest;
+  //console.log(this.options);
 };
 
 util.inherits(Generator, yeoman.generators.NamedBase);

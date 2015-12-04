@@ -9,7 +9,7 @@
 	    fields: [{
       		label: 'Object Name',
       		name: 'Name',
-	      	string: { length: 80 }
+	      	text: { length: 80 }
     	}]
 		layout: {
 		}
