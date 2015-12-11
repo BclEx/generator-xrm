@@ -29,7 +29,6 @@ describe('fragment generator app test', function () {
         '../app', '../database', '../server-aspnet',
         [createDummyGenerator(), 'fragment:sql']
       ];
-
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
@@ -58,7 +57,7 @@ describe('fragment generator app test', function () {
         }]
       };
       xrm.run(function () {
-        //console.log(this.ctx);
+        console.log(this.ctx);
         // assert(this.ctx.createTable == 'test');
         // assert(Array.isArray(this.ctx.t));
         // var t = this.ctx.t;

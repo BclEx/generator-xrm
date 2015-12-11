@@ -11,6 +11,7 @@
 // External libs.
 var util = require('util');
 var scriptBase = require('../script-base.js');
+var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var knexFunc = require('knex');
 //global.req = require; // Used by mssql

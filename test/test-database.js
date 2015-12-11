@@ -23,13 +23,12 @@ describe('fragment generator load test', function () {
     });
   };
 
-  describe('database endpoint reached.', function () {
+  describe('database endpoint reached', function () {
     before(function (done) {
       var deps = [
         '../database',
         [createDummyGenerator(), 'fragment:sql']
       ];
-
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
@@ -38,7 +37,7 @@ describe('fragment generator load test', function () {
         done();
       });
     });
-    it('can be loaded by object.', function (done) {
+    it('can be loaded by object', function (done) {
       xrm.options.ctx = {
         name: 'test',
         fields: [{

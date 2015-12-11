@@ -31,7 +31,10 @@
     "yeoman-generator": "^0.20.2",
     "yosay": "^0.1.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "bluebird": "^3.0.6",
+    "debug": "^2.2.0"
+  },
   "peerDependencies": {
     "yo": ">=1.0.0"
   },

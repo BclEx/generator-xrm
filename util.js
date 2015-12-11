@@ -67,9 +67,21 @@ function appName (self) {
   return suffix ? self._.classify(suffix) : '';
 }
 
+var Location = function Location(root) {
+  this._root = root;
+};
+
+Location.prototype.getEnsuredPath = function (subPath, file) {
+  var newPath = path.join(this._root, subPath);
+  if (!fs.existsSync(newPath)) {
+    fs.mkdirSync(newPath);
+  }
+  return path.join(newPath, file);
+};
 
 module.exports = {
   rewrite: rewrite,
   rewriteFile: rewriteFile,
-  appName: appName
+  appName: appName,
+  Location: Location
 };

@@ -12,24 +12,27 @@
 var util = require('util');
 var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
+var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var _ = require('lodash');
 
 var Generator = module.exports = function Generator() {
+  this._moduleName = 'xrm:database';
   scriptBase.apply(this, arguments);
 };
 
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
-  this.log(chalk.green('define sql...'));
+  debug('Defining sql');
   var ctx = this.options.ctx;
-
+  var location = this.location;
+  
   // test ctx
   var entityName = ctx.name || 'entity';
   var fields = ctx.fields;
   if (!Array.isArray(fields)) {
-    this.log(chalk.red('ERR! { fields: not array }')); return null;
+    this.log(chalk.bold('ERR! ' + chalk.green('{ fields: }') + ' not array')); return null;
   }
 
   // build content
@@ -40,35 +43,78 @@ Generator.prototype.createFiles = function createFiles() {
   t.push({ datetime: { name: 'ModifyOn' }, notNullable: true });
   t.push({ uuid: { name: 'ModifyBy' }, notNullable: true });
   fields.forEach(function (prop) {
+
     var propName = prop.name;
     if (!propName) {
-      this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
+      this.log(chalk.bold('ERR! ' + chalk.green(entityName + '.' + propName + ': { field.name: }') + ' not defined')); return null;
     }
     var maxlength;
-    if (prop.hasOwnProperty('text')) {
-      maxlength = prop.text.maxlength;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('memo')) {
-      maxlength = prop.memo.maxlength;
-      t.push({ string: { name: propName, length: maxlength } });
+    var defaultValue;
+    if (prop.hasOwnProperty('autoNumber')) {
+      // notimplemented
+    } else if (prop.hasOwnProperty('formula')) {
+      // notimplemented
+    } else if (prop.hasOwnProperty('rollupSummary')) {
+      // notimplemented
     } else if (prop.hasOwnProperty('lookup')) {
       var lookupEntity = prop.lookup.entity;
       t.push({ uuid: { name: propName + 'Id' }, references: lookupEntity + '.' + lookupEntity + 'Id', onDelete: 'CASCADE' });
-    } else if (prop.hasOwnProperty('picklist')) {
+    } else if (prop.hasOwnProperty('masterDetail')) {
+      var masterDetailEntity = prop.masterDetail.entity;
+      t.push({ uuid: { name: propName + 'Id' }, references: masterDetailEntity + '.' + masterDetailEntity + 'Id', onDelete: 'CASCADE' });
+    } else if (prop.hasOwnProperty('externalLookup')) {
       t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('date')) {
-      t.push({ dateTime: { name: propName } });
-    } else if (prop.hasOwnProperty('decimal')) {
-      t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+    } else if (prop.hasOwnProperty('checkbox')) {
+      defaultValue = prop.checkbox.defaultValue;
+      t.push({ bit: { name: propName } });
     } else if (prop.hasOwnProperty('currency')) {
       t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+    } else if (prop.hasOwnProperty('date')) {
+      t.push({ date: { name: propName } });
+    } else if (prop.hasOwnProperty('dateTime')) {
+      t.push({ datetime: { name: propName } });
+    } else if (prop.hasOwnProperty('email')) {
+      t.push({ string: { name: propName } });
+    } else if (prop.hasOwnProperty('geolocation')) {
+      // notimplemented
+    } else if (prop.hasOwnProperty('number')) {
+      t.push({ int: { name: propName } });
+      //t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+    } else if (prop.hasOwnProperty('percent')) {
+      t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+    } else if (prop.hasOwnProperty('phone')) {
+      t.push({ string: { name: propName } });
+    } else if (prop.hasOwnProperty('picklist')) {
+      t.push({ string: { name: propName } });
+    } else if (prop.hasOwnProperty('text')) {
+      maxlength = prop.text.length;
+      t.push({ string: { name: propName, length: maxlength } });
+    } else if (prop.hasOwnProperty('textArea')) {
+      maxlength = prop.memo.maxlength;
+      t.push({ string: { name: propName, length: maxlength } });
+    } else if (prop.hasOwnProperty('textAreaLong')) {
+      maxlength = prop.memo.maxlength;
+      t.push({ string: { name: propName, length: maxlength } });
+    } else if (prop.hasOwnProperty('textAreaRich')) {
+      maxlength = prop.memo.maxlength;
+      t.push({ string: { name: propName, length: maxlength } });
+    } else if (prop.hasOwnProperty('textEncrypted')) {
+      maxlength = prop.memo.maxlength;
+      t.push({ string: { name: propName, length: maxlength } });
+    } else if (prop.hasOwnProperty('url')) {
+      t.push({ string: { name: propName } });
     } else {
-      this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
+      this.log(chalk.bold('ERR! ' + chalk.green(entityName + '.' + propName + ': { field.prop: }') + ' not matched')); return null;
     }
-  });
+  }.bind(this));
 
-  var opts = { ctx: { createTable: entityName, t: t } };
-  this.composeWith('fragment:sql', { options: opts });
+  var sqlCtx = {
+    _name: entityName,
+    _file: location.getEnsuredPath('dbo/Tables', entityName + '.sql'),
+    _client: 'mssql',
+    createTable0: { createTable: entityName, t: t }
+  };
+  this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
 
 // Generator.prototype.createFiles2 = function createFiles2() {

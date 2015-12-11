@@ -12,6 +12,7 @@
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
+var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var yosay = require('yosay');
 

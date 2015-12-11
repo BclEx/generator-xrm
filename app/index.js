@@ -11,21 +11,26 @@
 // External libs.
 var util = require('util');
 var scriptBase = require('../script-base.js');
+var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
+var Location = require('../util').Location;
 
 var Generator = module.exports = function Generator() {
+	this._moduleName = 'xrm:app';
 	scriptBase.apply(this, arguments);
+	this.conflicter.force = true;
+	var done = this.async();
 	this.on('end', function () {
-		var lib = this.env.get('xrm:database');
-		console.log(lib);
-		// this.composeWith('xrm:database', { options: { ctx: this.options.ctx } });
-		// this.composeWith('xrm:client-angular', { options: { ctx: this.options.ctx } });
-		// this.composeWith('xrm:server-aspnet', { options: { ctx: this.options.ctx });
+		done();
 	});
 };
 
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
-	this.log(chalk.green('Building app...'));
+	debug('Defining app');
+	var dest = this.options.dest;
+	this.composeWith('xrm:database', { options: [new Location(dest.database), this.options] });
+	// this.composeWith('xrm:client-angular', { options: [new Location(dest.client), this.options] });
+	// this.composeWith('xrm:server-aspnet', { options: [new Location(dest.server), this.options] });
 };
