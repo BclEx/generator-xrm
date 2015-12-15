@@ -30,7 +30,7 @@ util.inherits(Generator, scriptBase);
 Generator.prototype.createFiles = function createFiles() {
 	debug('Defining app');
 	var dest = this.options.dest;
-	this.composeWith('xrm:database', { options: [new Location(dest.database), this.options] });
-	// this.composeWith('xrm:client-angular', { options: [new Location(dest.client), this.options] });
+	this.composeWith('xrm:database', { options: { location: new Location(dest.database), ctx: this.ctx } });
+	this.composeWith('xrm:client-angular', { options: { location: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: this.ctx } });
 	// this.composeWith('xrm:server-aspnet', { options: [new Location(dest.server), this.options] });
 };

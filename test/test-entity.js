@@ -45,7 +45,6 @@ describe('fragment generator load test', function () {
         fields: [{
           label: 'Object Name',
           name: 'Name',
-          required: true,
           text: { length: 80 }
         }]
       };

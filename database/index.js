@@ -14,11 +14,16 @@ var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
 var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
+var Location = require('../util').Location;
 var _ = require('lodash');
 
 var Generator = module.exports = function Generator() {
   this._moduleName = 'xrm:database';
   scriptBase.apply(this, arguments);
+  var done = this.async();
+  this.on('end', function () {
+    done();
+  });
 };
 
 util.inherits(Generator, scriptBase);
@@ -26,9 +31,8 @@ util.inherits(Generator, scriptBase);
 Generator.prototype.createFiles = function createFiles() {
   debug('Defining sql');
   var ctx = this.options.ctx;
-  var location = this.location;
   
-  // test ctx
+  // ctx
   var entityName = ctx.name || 'entity';
   var fields = ctx.fields;
   if (!Array.isArray(fields)) {
@@ -50,6 +54,7 @@ Generator.prototype.createFiles = function createFiles() {
     }
     var maxlength;
     var defaultValue;
+    var relatedTo;
     if (prop.hasOwnProperty('autoNumber')) {
       // notimplemented
     } else if (prop.hasOwnProperty('formula')) {
@@ -57,11 +62,11 @@ Generator.prototype.createFiles = function createFiles() {
     } else if (prop.hasOwnProperty('rollupSummary')) {
       // notimplemented
     } else if (prop.hasOwnProperty('lookup')) {
-      var lookupEntity = prop.lookup.entity;
-      t.push({ uuid: { name: propName + 'Id' }, references: lookupEntity + '.' + lookupEntity + 'Id', onDelete: 'CASCADE' });
+      relatedTo = prop.lookup.relatedTo;
+      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
     } else if (prop.hasOwnProperty('masterDetail')) {
-      var masterDetailEntity = prop.masterDetail.entity;
-      t.push({ uuid: { name: propName + 'Id' }, references: masterDetailEntity + '.' + masterDetailEntity + 'Id', onDelete: 'CASCADE' });
+      relatedTo = prop.masterDetail.relatedTo;
+      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
     } else if (prop.hasOwnProperty('externalLookup')) {
       t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('checkbox')) {
@@ -86,6 +91,8 @@ Generator.prototype.createFiles = function createFiles() {
       t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('picklist')) {
       t.push({ string: { name: propName } });
+    } else if (prop.hasOwnProperty('picklistMulti')) {
+      t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('text')) {
       maxlength = prop.text.length;
       t.push({ string: { name: propName, length: maxlength } });
@@ -108,12 +115,14 @@ Generator.prototype.createFiles = function createFiles() {
     }
   }.bind(this));
 
+  var location = this.location || new Location();
   var sqlCtx = {
     _name: entityName,
     _file: location.getEnsuredPath('dbo/Tables', entityName + '.sql'),
     _client: 'mssql',
-    createTable0: { createTable: entityName, t: t }
+    createTable: { createTable: entityName, t: t }
   };
+  // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
 

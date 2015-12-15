@@ -9,18 +9,20 @@ var Location = require('./util').Location;
 
 var Generator = module.exports = function Generator() {
   // console.log(this._moduleName, arguments);
-  var location = null;
-  if (Array.isArray(arguments[1])) {
-    location = arguments[1][0];
-    arguments[1] = arguments[1][1];
-  } else {
-    location = new Location();
-  }
+  // var location = null;
+  // if (Array.isArray(arguments[1])) {
+  //   location = arguments[1][0];
+  //   arguments[1] = arguments[1][1];
+  // } else {
+  //   location = new Location();
+  // }
   var ctx = {};
+  var location = null;
   var a = arguments[0];
   if (typeof a[0] === 'undefined') {
     a = arguments[1];
     ctx = a.ctx || {};
+    location = a.location;
     debug(this._moduleName + ' from parent: ' + ctx.name);
   } else if (typeof a[0] != 'string') {
     ctx = a[0] || {};
@@ -37,7 +39,7 @@ var Generator = module.exports = function Generator() {
     } catch (e) { debug('An error occured while running ' + name, e); this.log(chalk.bold(e)); }
   }
   yeoman.generators.Base.apply(this, arguments);
-  this.options.ctx = ctx;
+  this.ctx = ctx;
   this.location = location;
 };
 

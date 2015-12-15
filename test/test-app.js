@@ -23,7 +23,7 @@ describe('fragment generator app test', function () {
     });
   };
 
-  describe('app endpoint reached.', function () {
+  describe('app endpoint reached', function () {
     before(function (done) {
       var deps = [
         '../app', '../database', '../server-aspnet',
@@ -37,23 +37,21 @@ describe('fragment generator app test', function () {
         done();
       });
     });
-    it('can be loaded by object.', function (done) {
+    it('can be loaded by object', function (done) {
       xrm.options.ctx = {
         name: 'test',
         fields: [{
           label: 'Name',
           name: 'Name',
-          required: true,
           text: { maxlength: 150 }
         }, {
           label: 'Category',
           name: 'Category',
-          required: true,
           picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
         }, {
           label: 'Metadata',
           name: 'Metadata',
-          memo: { maxlength: 2000 }
+          text: { maxlength: 2000 }
         }]
       };
       xrm.run(function () {
