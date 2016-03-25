@@ -1,6 +1,6 @@
 /*
- * generator-fragment
- * https://github.com/BclEx/generator-fragment
+ * generator-xrm
+ * https://github.com/BclEx/generator-xrm
  *
  * Copyright (c) 2015 Sky Morey, contributors
  * Licensed under the MIT license.
@@ -18,14 +18,13 @@ var Location = require('../util').Location;
 var _ = require('lodash');
 
 var Generator = module.exports = function Generator() {
-  this._moduleName = 'xrm:server';
+  this._moduleName = 'xrm:server-aspnet';
   scriptBase.apply(this, arguments);
   var done = this.async();
   this.on('end', function () {
     done();
   });
 };
-
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {

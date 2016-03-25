@@ -1,6 +1,6 @@
 /*
- * generator-fragment
- * https://github.com/BclEx/generator-fragment
+ * generator-xrm
+ * https://github.com/BclEx/generator-xrm
  *
  * Copyright (c) 2015 Sky Morey, contributors
  * Licensed under the MIT license.

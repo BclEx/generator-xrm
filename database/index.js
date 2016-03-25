@@ -1,6 +1,6 @@
 /*
  * generator-xrm
- * https://github.com/BclEx/generator-fragment
+ * https://github.com/BclEx/generator-xrm
  *
  * Copyright (c) 2015 Sky Morey, contributors
  * Licensed under the MIT license.
@@ -25,7 +25,6 @@ var Generator = module.exports = function Generator() {
     done();
   });
 };
-
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
