@@ -17,7 +17,7 @@ describe('client-angular test', function () {
 
   var createDummyGenerator = function () {
     return yeoman.generators.Base.extend({
-      test: function () {
+      clientAngular: function () {
         xrm.ctx = this.options.ctx;
       }
     });
@@ -47,30 +47,17 @@ describe('client-angular test', function () {
           name: 'Name',
           text: { maxlength: 150 }
         }, {
-          label: 'Category',
-          name: 'Category',
-          picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
-        }, {
-          label: 'Metadata',
-          name: 'Metadata',
-          text: { maxlength: 2000 }
-        }]
+            label: 'Category',
+            name: 'Category',
+            picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
+          }, {
+            label: 'Metadata',
+            name: 'Metadata',
+            text: { maxlength: 2000 }
+          }]
       };
       xrm.run(function () {
         console.log(this.ctx);
-        // var a = this.ctx.createTable;
-        // assert(a.createTable == 'test');
-        // assert(Array.isArray(a.t));
-        // var t = a.t;
-        // // console.log(t[0]);
-        // assert(t[0].uuid.name == 'testId');
-        // assert(t[1].datetime.name == 'CreateOn');
-        // assert(t[2].uuid.name == 'CreateBy');
-        // assert(t[3].datetime.name == 'ModifyOn');
-        // assert(t[4].uuid.name == 'ModifyBy');
-        // assert(t[5].string.name == 'Name');
-        // assert(t[6].string.name == 'Category');
-        // assert(t[7].string.name == 'Metadata');
         done();
       }.bind(xrm));
     });

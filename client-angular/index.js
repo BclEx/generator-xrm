@@ -22,7 +22,7 @@ var Generator = module.exports = function Generator() {
     this._moduleName = 'xrm:client-angular';
     scriptBase.apply(this, arguments);
     var done = this.async();
-    this.on('end', function() {
+    this.on('end', function () {
         done();
     });
 };
@@ -40,30 +40,33 @@ Generator.prototype.createFiles = function createFiles() {
     }
 
     // build content
-    var s = [[][][]];
+    var s = [[], [], []];
     var theme = new Theme(entityName, this.log);
     theme.buildAllElements(s, fields);
 
-    var locationHtml = this.location.html || new Location();
-    var locationJs = this.location.jss || new Location();
-    var locationCss = this.location.css || new Location();
+    var location = this.location || { html: null, jss: null, css: null };
+    var locationHtml = location.html || new Location();
+    var locationJs = location.jss || new Location();
+    var locationCss = location.css || new Location();
     var htmlCtx = {
         _name: entityName,
         _file: locationHtml.getEnsuredPath(entityName, entityName + '-entry.cshtml'),
-        html: function(args, $) {
-            var form = $('');
-            $('html').append(form);
-            return $;
-        }
+        // html: function (args, $) {
+        //     var form = $('html');
+        //     $('html').append(form);
+        //     return $;
+        // }
+        html: { append: s[0] },
     };
     var cssCtx = {
         _name: entityName,
         _file: locationJs.getEnsuredPath('css/partials', '_' + entityName + '-entry.scss'),
-        createCss: {}
+        css: {}
     };
     var jsCtx = {
         _name: entityName,
         _file: locationCss.getEnsuredPath('src/modules', entityName + 'Module.js'),
+        js: {}
     };
     //console.log(htmlCtx);
     this.composeWith('fragment:html', { options: { ctx: htmlCtx } });

@@ -5,11 +5,11 @@ var path = require('path');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
-describe('xrm generator load test.', function () {
+describe('load test.', function () {
 
   it('can be imported without blowing up.', function () {
     assert(require('../app') !== undefined);
-    //assert(require('../client-angular') !== undefined);
+    assert(require('../client-angular') !== undefined);
     assert(require('../database') !== undefined);
     //assert(require('../server-aspnet') !== undefined);
   });
@@ -27,7 +27,7 @@ describe('xrm generator load test.', function () {
         if (err) {
           done(err);
         }
-        fs.writeFileSync(path.join(__dirname, '../tmp', 'name-x.json'),
+        fs.writeFileSync(path.join(__dirname, '../tmp', 'name-x.js'),
 '{\
 	key: "value0",\
 	func: function () { return "value1"; } \

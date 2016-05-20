@@ -8,14 +8,7 @@ var chalk = require('chalk');
 var Location = require('./util').Location;
 
 var Generator = module.exports = function Generator() {
-  // console.log(this._moduleName, arguments);
-  // var location = null;
-  // if (Array.isArray(arguments[1])) {
-  //   location = arguments[1][0];
-  //   arguments[1] = arguments[1][1];
-  // } else {
-  //   location = new Location();
-  // }
+  //debug(this._moduleName, arguments);
   var ctx = {};
   var location = null;
   var a = arguments[0];
@@ -31,8 +24,8 @@ var Generator = module.exports = function Generator() {
   } else {
     var name = null;
     try {
-      var filePath = path.join(process.cwd(), a[0] + '.json');
-      name = path.basename(filePath, '.json');
+      var filePath = path.join(process.cwd(), a[0] + '.js');
+      name = path.basename(filePath, '.js');
       ctx = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0];
       ctx.name = name;
       debug(this._moduleName + ' from file: ' + ctx.name);

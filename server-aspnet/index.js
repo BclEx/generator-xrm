@@ -28,5 +28,5 @@ var Generator = module.exports = function Generator() {
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
-	debug('Defining server');
+  debug('Defining server');
 };

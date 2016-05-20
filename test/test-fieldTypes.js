@@ -6,7 +6,7 @@ var yeoman = require('yeoman-generator');
 var helpers = require('yeoman-generator').test;
 var assert = require('yeoman-generator').assert;
 
-describe('fragment generator load test', function () {
+describe('fieldTypes test', function () {
 
   var xrm, genOptions = {
     'appPath': 'app',

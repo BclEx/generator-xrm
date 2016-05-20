@@ -21,26 +21,31 @@ var Theme = module.exports = function Theme() {
 };
 util.inherits(Theme, themeBase);
 
-Theme.prototype.buildAllElements = function buildElement(s, fields) {
-    fields.forEach(function(prop) {
-        buildElement(s, prop);
+Theme.prototype.buildAllElements = function buildAllElements(s, fields) {
+    var flag = false;
+    fields.forEach(function (prop) {
+        flag |= this.buildElement(s, prop);
     }.bind(this));
+    return flag;
 }
 
 Theme.prototype.buildForm = function buildForm(s, body) {
     var t1 = s[0];
-    // <form name="jobEntry" ng-controller="JobEntryController as form" ng-submit="form.submit(jobEntry.$valid, data)">
-    //     <fieldset class="offical-use" ng-if="officalUse">
-    //         html0
-    //     </fieldset>
-    // </form>
-    t1.push(function ($) { $('\
-<div ng-app="'+ entityName + 'Module">\n\
-  <section class="form-entry ' + entityName + '-entry">\n\
-    <form name="' + entityName + 'Entry" ng-controller="' + entityName + 'EntryController as form" ng-submit="form.submit(' + entityName + 'Entry.$valid, data)">\n');
-    });
-    body();
-    t1.push(function ($) { $('\
+    // <div ng-app="sampleModule">
+    // <section class="form-entry sample-entry">
+    //    <form name="sampleEntry" ng-controller="sampleEntryController as form" ng-submit="form.submit(jobEntry.$valid, data)">
+    //    </form>
+    // </section>
+    // </div>
+    t1.push(function (selector, $) {
+        $(selector).append('\
+<div ng-app="'+ this.entityName + 'Module">\n\
+  <section class="form-entry ' + this.entityName + '-entry">\n\
+    <form name="' + this.entityName + 'Entry" ng-controller="' + this.entityName + 'EntryController as form" ng-submit="form.submit(' + this.entityName + 'Entry.$valid, data)">\n');
+    }.bind(this));
+    body(s);
+    t1.push(function (selector, $) {
+        $(selector).append('\
     </form>\n\
   </section>\n\
 </div>\n');
@@ -62,7 +67,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         <input id="firstName" class="slds-input" type="text" placeholder="Placeholder Text" name="data.firstName" ng-model="firstName" readonly />
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
@@ -79,14 +85,15 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         </select>
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">\n\
     <div class="slds-form-element">\n\
         <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
         <select name="' + propName + '" name="data.' + propName + '" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose ' + prop.label + '..." chosen>\n\
             <option label=""></option>\n\
         </select>\n\
-    </div>\n\n\
+    </div>\n\
 </div>\n');
         });
     } else if (prop.hasOwnProperty('checkbox')) {
@@ -99,7 +106,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         </label>
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <div class="slds-form-element__control">\n\
         <label class="slds-checkbox">\n\
@@ -127,11 +135,12 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         else if (prop.hasOwnProperty('percent')) fieldType = 'text';
         else if (prop.hasOwnProperty('phone')) fieldType = 'tel';
         else if (prop.hasOwnProperty('url')) fieldType = 'url';
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
-        <input id="'+ propName + '" class="slds-input" type="'+ fieldType +'" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+        <input id="'+ propName + '" class="slds-input" type="' + fieldType + '" name="data.' + propName + '" ng-model="' + propName + '" />\n\
     </div>\n\
 </div>\n');
         });
@@ -146,7 +155,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         </div>
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
@@ -165,7 +175,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         <input id="firstName" type="text" name="data.firstName" ng-model="firstName" />
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
@@ -180,7 +191,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         <textarea id="firstName" class="slds-textarea" name="data.firstName" ng-model="firstName" />
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
@@ -195,7 +207,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //         <input id="firstName" class="slds-input" type="text" name="data.firstName" ng-model="firstName" />
         //     </div>
         // </div>
-        t1.push(function ($) { $('\
+        t1.push(function (selector, $) {
+            $(selector).append('\
 <div class="slds-form-element">\n\
     <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
     <div class="slds-form-element__control">\n\
@@ -209,27 +222,25 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
     return true;
 };
 
-Theme.prototype.buildHeader = function buildPage(s, body) {
+Theme.prototype.buildHeader = function buildHeader(s, body) {
     var t1 = s[0];
-    t1.push(function ($) { $('\
+    t1.push(function (selector, $) {
+        $(selector).append('\
 <div class="slds">\n\
     <div class="slds" style="margin-top:10px;margin-left:10px;">\n');
     });
-    body();
-    t1.push(function ($) { $('\
+    body(s);
+    t1.push(function (selector, $) {
+        $(selector).append('\
     </div>\n\
 </div>\n');
     });
 };
 
-Theme.prototype.buildFooter = function buildFooter(s) {
-    var t1 = s[0];
-    
-};
-
 Theme.prototype.buildDetailHeader = function buildDetailHeader(s) {
     var t1 = s[0];
-    t1.push(function ($) { $('\
+    t1.push(function (selector, $) {
+        $(selector).append('\
     <div class="slds-page-header" role="banner">\n\
     <div class="slds-grid">\n\
         <div class="slds-col slds-has-flexi-truncate">\n\
@@ -340,7 +351,8 @@ Theme.prototype.buildDetailHeader = function buildDetailHeader(s) {
 
 Theme.prototype.buildListHeader = function buildListHeader(s) {
     var t1 = s[0];
-    t1.push(function ($) { $('\
+    t1.push(function (selector, $) {
+        $(selector).append('\
 <div class="slds-page-header" role="banner">\n\
     <div class="slds-grid">\n\
         <div class="slds-col slds-has-flexi-truncate">\n\

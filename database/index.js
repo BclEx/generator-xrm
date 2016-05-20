@@ -28,9 +28,9 @@ var Generator = module.exports = function Generator() {
 util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
-  debug('Defining sql');
+  debug('Defining database');
   var ctx = this.options.ctx;
-  
+
   // ctx
   var entityName = ctx.name || 'entity';
   var fields = ctx.fields;
@@ -45,6 +45,9 @@ Generator.prototype.createFiles = function createFiles() {
   t.push({ uuid: { name: 'CreateBy' }, notNullable: true });
   t.push({ datetime: { name: 'ModifyOn' }, notNullable: true });
   t.push({ uuid: { name: 'ModifyBy' }, notNullable: true });
+  if (ctx.hasOwnProperty('recordTypes')) {
+    t.push({ string: { name: 'RecordType' }, notNullable: true });
+  }
   fields.forEach(function (prop) {
 
     var propName = prop.name;
@@ -70,7 +73,7 @@ Generator.prototype.createFiles = function createFiles() {
       t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('checkbox')) {
       defaultValue = prop.checkbox.defaultValue;
-      t.push({ bit: { name: propName } });
+      t.push({ boolean: { name: propName } });
     } else if (prop.hasOwnProperty('currency')) {
       t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
     } else if (prop.hasOwnProperty('date')) {
@@ -82,10 +85,15 @@ Generator.prototype.createFiles = function createFiles() {
     } else if (prop.hasOwnProperty('geolocation')) {
       // notimplemented
     } else if (prop.hasOwnProperty('number')) {
-      t.push({ int: { name: propName } });
-      //t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+      var precision = prop.number.precision || 18;
+      var scale = prop.number.scale || 0;
+      if (scale == 0) {
+        t.push({ integer: { name: propName } });
+      } else {
+        t.push({ decimal: { name: propName, precision: precision, scale: scale } });
+      }
     } else if (prop.hasOwnProperty('percent')) {
-      t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
+      t.push({ decimal: { name: propName, precision: 18, scale: scale } });
     } else if (prop.hasOwnProperty('phone')) {
       t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('picklist')) {
@@ -96,16 +104,16 @@ Generator.prototype.createFiles = function createFiles() {
       maxlength = prop.text.length;
       t.push({ string: { name: propName, length: maxlength } });
     } else if (prop.hasOwnProperty('textArea')) {
-      maxlength = prop.memo.maxlength;
+      maxlength = prop.textArea.length;
       t.push({ string: { name: propName, length: maxlength } });
     } else if (prop.hasOwnProperty('textAreaLong')) {
-      maxlength = prop.memo.maxlength;
+      maxlength = prop.textAreaLong.length;
       t.push({ string: { name: propName, length: maxlength } });
     } else if (prop.hasOwnProperty('textAreaRich')) {
-      maxlength = prop.memo.maxlength;
+      maxlength = prop.textAreaRich.length;
       t.push({ string: { name: propName, length: maxlength } });
     } else if (prop.hasOwnProperty('textEncrypted')) {
-      maxlength = prop.memo.maxlength;
+      maxlength = prop.textEncrypted.length;
       t.push({ string: { name: propName, length: maxlength } });
     } else if (prop.hasOwnProperty('url')) {
       t.push({ string: { name: propName } });
@@ -121,52 +129,32 @@ Generator.prototype.createFiles = function createFiles() {
     _client: 'mssql',
     createTable: { createTable: entityName, t: t }
   };
+  if (ctx.hasOwnProperty('relations')) {
+    var relations = ctx.relations;
+    if (!Array.isArray(relations)) {
+      this.log(chalk.bold('ERR! ' + chalk.green('{ relations: }') + ' not array')); return null;
+    }
+    var children = sqlCtx._children = [];
+    relations.forEach(function (prop) {
+
+      var propName = prop.name;
+      if (!propName) {
+        this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.name: }') + ' not defined')); return null;
+      }
+      var relatedTo = prop.relatedTo;
+      if (!relatedTo) {
+        this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.relatedTo: }') + ' not defined')); return null;
+      }
+      var t = [];
+      t.push({ uuid: { name: entityName + 'Id' }, references: entityName + '.' + entityName + 'Id', onDelete: 'CASCADE' });
+      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
+      children.push({
+        _name: entityName + '_' + propName,
+        _file: location.getEnsuredPath('dbo/Tables', entityName + '_' + propName + '.sql'),
+        createTable: { createTable: entityName + '_' + propName, t: t }
+      });
+    });
+  }
   // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
-
-// Generator.prototype.createFiles2 = function createFiles2() {
-//   this.log(chalk.green('Building sql2...'));
-//   var ctx = this.options.ctx;
-//   var entityName = ctx.name || 'entity';
-//   var fields = ctx.fields;
-//   if (!Array.isArray(fields)) {
-//     this.log(chalk.red('ERR! { fields: not array }')); return null;
-//   }
-// 
-//   var ddl0 = "return knex.schema.createTable('" + entityName + "', function (t) {\
-// t.increments('"+ entityName + "Id').notNullable().primary('" + entityName + "Id');\
-// t.datetime('CreateOn').notNullable();\
-// t.uuid('CreateBy').notNullable();\
-// t.datetime('ModifyOn').notNullable();\
-// t.uuid('ModifyBy').notNullable();\
-// ";
-//   fields.forEach(function (prop) {
-//     var propName = prop.name;
-//     if (!propName) {
-//       this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
-//     }
-//     var maxlength;
-//     if (prop.text) {
-//       maxlength = prop.text.maxlength;
-//       ddl0 += "t.string('" + propName + "', " + maxlength + ");";
-//     } else if (prop.memo) {
-//       maxlength = prop.memo.maxlength;
-//       ddl0 += "t.string('" + propName + "', " + maxlength + ");";
-//     } else if (prop.lookup) {
-//       var lookupEntity = prop.lookup.entity;
-//       ddl0 += "t.uuid('" + propName + "Id').references('" + lookupEntity + "." + lookupEntity + "Id').onDelete('CASCADE');";
-//     } else if (prop.picklist) {
-//       ddl0 += "t.string('" + propName + "', -1);";
-//     } else if (prop.date) {
-//       ddl0 += "t.dateTime('" + propName + "', -1);";
-//     } else if (prop.decimal) {
-//       ddl0 += "t.decimal('" + propName + "', 18, 4);";
-//     } else if (prop.currency) {
-//       ddl0 += "t.decimal('" + propName + "', 18, 4);";
-//     } else {
-//       this.log(chalk.red('ERR! { field.propName: not defined }')); return null;
-//     }
-//   });
-//   return ddl0;
-// };
