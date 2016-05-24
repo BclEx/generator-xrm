@@ -30,6 +30,9 @@ util.inherits(Generator, scriptBase);
 Generator.prototype.createFiles = function createFiles() {
   debug('Defining database');
   var ctx = this.options.ctx;
+  var schemaName = ctx.schemaName || '';
+  var schemaFolder = schemaName || 'dbo';
+  var client = 'mssql';
 
   // ctx
   var entityName = ctx.name || 'entity';
@@ -46,10 +49,9 @@ Generator.prototype.createFiles = function createFiles() {
   t.push({ datetime: { name: 'ModifyOn' }, notNullable: true });
   t.push({ uuid: { name: 'ModifyBy' }, notNullable: true });
   if (ctx.hasOwnProperty('recordTypes')) {
-    t.push({ string: { name: 'RecordType' }, notNullable: true });
+    t.push({ string: { name: 'RecordType', length: 160 }, notNullable: true });
   }
   fields.forEach(function (prop) {
-
     var propName = prop.name;
     if (!propName) {
       this.log(chalk.bold('ERR! ' + chalk.green(entityName + '.' + propName + ': { field.name: }') + ' not defined')); return null;
@@ -57,6 +59,7 @@ Generator.prototype.createFiles = function createFiles() {
     var maxlength;
     var defaultValue;
     var relatedTo;
+    var onDelete;
     if (prop.hasOwnProperty('autoNumber')) {
       // notimplemented
     } else if (prop.hasOwnProperty('formula')) {
@@ -64,11 +67,13 @@ Generator.prototype.createFiles = function createFiles() {
     } else if (prop.hasOwnProperty('rollupSummary')) {
       // notimplemented
     } else if (prop.hasOwnProperty('lookup')) {
-      relatedTo = prop.lookup.relatedTo;
-      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
+      relatedTo = getObjectNameParts(schemaName, prop.lookup.relatedTo);
+      onDelete = getOnDelete(client, prop.lookup.onDelete);
+      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
     } else if (prop.hasOwnProperty('masterDetail')) {
-      relatedTo = prop.masterDetail.relatedTo;
-      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
+      relatedTo = getObjectNameParts(schemaName, prop.masterDetail.relatedTo);
+      onDelete = getOnDelete(client, 'cascade');
+      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
     } else if (prop.hasOwnProperty('externalLookup')) {
       t.push({ string: { name: propName } });
     } else if (prop.hasOwnProperty('checkbox')) {
@@ -125,9 +130,9 @@ Generator.prototype.createFiles = function createFiles() {
   var location = this.location || new Location();
   var sqlCtx = {
     _name: entityName,
-    _file: location.getEnsuredPath('dbo/Tables', entityName + '.sql'),
-    _client: 'mssql',
-    createTable: { createTable: entityName, t: t }
+    _file: location.getEnsuredPath(schemaFolder + '/Tables', entityName + '.sql'),
+    _client: client,
+    createTable: { schemaName: schemaName, createTable: entityName, t: t }
   };
   if (ctx.hasOwnProperty('relations')) {
     var relations = ctx.relations;
@@ -145,16 +150,43 @@ Generator.prototype.createFiles = function createFiles() {
       if (!relatedTo) {
         this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.relatedTo: }') + ' not defined')); return null;
       }
+      relatedTo = getObjectNameParts(schemaName, relatedTo);
+      var onDelete = getOnDelete(client, prop.onDelete || 'cascade');
       var t = [];
-      t.push({ uuid: { name: entityName + 'Id' }, references: entityName + '.' + entityName + 'Id', onDelete: 'CASCADE' });
-      t.push({ uuid: { name: propName + 'Id' }, references: relatedTo + '.' + relatedTo + 'Id', onDelete: 'CASCADE' });
+      t.push({ uuid: { name: entityName + 'Id' }, on: entityName, references: entityName + 'Id', onDelete: 'CASCADE' });
+      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
+      t.push({ primary: [entityName + 'Id', propName + 'Id'] });
       children.push({
         _name: entityName + '_' + propName,
-        _file: location.getEnsuredPath('dbo/Tables', entityName + '_' + propName + '.sql'),
-        createTable: { createTable: entityName + '_' + propName, t: t }
+        _file: location.getEnsuredPath(schemaFolder + '/Tables', entityName + '_' + propName + '.sql'),
+        createTable: { schemaName: schemaName, createTable: entityName + '_' + propName, t: t }
       });
     });
   }
   // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
+
+function getOnDelete(client, onDelete) {
+  switch (client) {
+    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
+      if (onDelete == 'clearvalue') {
+        return 'SET NULL';
+      } else if (onDelete == 'cascade') {
+        return 'CASCADE';
+      }
+      return null; // dontallow
+  }
+  return null;
+}
+
+function getObjectNameParts(schemaName, objectName) {
+  var pieces = undefined;
+  if (_.isString(objectName)) {
+    pieces = objectName.split('.');
+  }
+  if (!pieces || pieces.length === 1) {
+    return [schemaName + '.', pieces ? pieces[0] : objectName];
+  }
+  return [pieces[0] + '.', pieces[1]];
+}
