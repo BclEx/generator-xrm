@@ -29,8 +29,17 @@ util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
 	debug('Defining app');
+	var database = this.options.database || 'mssql';
+	var client = this.options.client || 'angular';
+	var server = this.options.server || 'aspnet';
 	var dest = this.options.dest || { database: null, html: null, js: null, css: null, server: null };
-	this.composeWith('xrm:database', { options: { location: new Location(dest.database), ctx: this.ctx } });
-	this.composeWith('xrm:client-angular', { options: { location: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: this.ctx } });
-	//this.composeWith('xrm:server-aspnet', { options: { location: new Location(dest.server), ctx: this.ctx } });
+	if (database != 'none') {
+		this.composeWith('xrm:database', { options: { database: database, location: new Location(dest.database), ctx: this.ctx } });
+	}
+	if (client != 'none') {
+		this.composeWith('xrm:client-' + client, { options: { location: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: this.ctx } });
+	}
+	if (server != 'none') {
+		this.composeWith('xrm:server-' + server, { options: { location: new Location(dest.server), ctx: this.ctx } });
+	}
 };

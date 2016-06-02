@@ -92,5 +92,5 @@ module.exports = {
   rewrite: rewrite,
   rewriteFile: rewriteFile,
   appName: appName,
-  Location: Location
+  Location: Location,
 };

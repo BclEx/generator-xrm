@@ -16,7 +16,7 @@ var chalk = require('chalk');
 var _ = require('lodash');
 
 var Theme = module.exports = function Theme() {
-    this._moduleName = 'theme:slds';
+    this._moduleName = 'theme:slds-angular';
     themeBase.apply(this, arguments);
 };
 util.inherits(Theme, themeBase);

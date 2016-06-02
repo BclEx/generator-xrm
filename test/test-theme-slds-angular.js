@@ -3,7 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 var assert = require('yeoman-generator').assert;
-var Theme = require('../theme-slds');
+var Theme = require('../theme-slds-angular');
 
 var theme;
 describe('theme-slds test', function () {

@@ -16,7 +16,7 @@ var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var Location = require('../util').Location;
 var _ = require('lodash');
-var Theme = require('../theme-slds');
+var Theme = require('../theme-slds-angular');
 
 var Generator = module.exports = function Generator() {
     this._moduleName = 'xrm:client-angular';
@@ -44,9 +44,9 @@ Generator.prototype.createFiles = function createFiles() {
     var theme = new Theme(entityName, this.log);
     theme.buildAllElements(s, fields);
 
-    var location = this.location || { html: null, jss: null, css: null };
+    var location = this.location || { html: null, js: null, css: null };
     var locationHtml = location.html || new Location();
-    var locationJs = location.jss || new Location();
+    var locationJs = location.js || new Location();
     var locationCss = location.css || new Location();
     var htmlCtx = {
         _name: entityName,
@@ -58,18 +58,18 @@ Generator.prototype.createFiles = function createFiles() {
         // }
         html: { append: s[0] },
     };
-    var cssCtx = {
-        _name: entityName,
-        _file: locationJs.getEnsuredPath('css/partials', '_' + entityName + '-entry.scss'),
-        css: {}
-    };
     var jsCtx = {
         _name: entityName,
-        _file: locationCss.getEnsuredPath('src/modules', entityName + 'Module.js'),
+        _file: locationJs.getEnsuredPath('src/modules', entityName + 'Module.js'),
         js: {}
+    };
+    var cssCtx = {
+        _name: entityName,
+        _file: locationCss.getEnsuredPath('css/partials', '_' + entityName + '-entry.scss'),
+        css: {}
     };
     //console.log(htmlCtx);
     this.composeWith('fragment:html', { options: { ctx: htmlCtx } });
-    //this.composeWith('fragment:css', { options: { ctx: cssCtx } });
     //this.composeWith('fragment:js', { options: { ctx: jsCtx } });
+    //this.composeWith('fragment:css', { options: { ctx: cssCtx } });
 };

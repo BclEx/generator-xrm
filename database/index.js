@@ -32,7 +32,7 @@ Generator.prototype.createFiles = function createFiles() {
   var ctx = this.options.ctx;
   var schemaName = ctx.schemaName || '';
   var schemaFolder = schemaName || 'dbo';
-  var client = 'mssql';
+  var database = this.options.database || 'mssql';
 
   // ctx
   var entityName = ctx.name || 'entity';
@@ -68,11 +68,11 @@ Generator.prototype.createFiles = function createFiles() {
       // notimplemented
     } else if (prop.hasOwnProperty('lookup')) {
       relatedTo = getObjectNameParts(schemaName, prop.lookup.relatedTo);
-      onDelete = getOnDelete(client, prop.lookup.onDelete);
+      onDelete = getOnDelete(database, prop.lookup.onDelete);
       t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
     } else if (prop.hasOwnProperty('masterDetail')) {
       relatedTo = getObjectNameParts(schemaName, prop.masterDetail.relatedTo);
-      onDelete = getOnDelete(client, 'cascade');
+      onDelete = getOnDelete(database, 'cascade');
       t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
     } else if (prop.hasOwnProperty('externalLookup')) {
       t.push({ string: { name: propName } });
@@ -131,7 +131,7 @@ Generator.prototype.createFiles = function createFiles() {
   var sqlCtx = {
     _name: entityName,
     _file: location.getEnsuredPath(schemaFolder + '/Tables', entityName + '.sql'),
-    _client: client,
+    _client: database,
     createTable: { schemaName: schemaName, createTable: entityName, t: t }
   };
   if (ctx.hasOwnProperty('relations')) {
@@ -151,7 +151,7 @@ Generator.prototype.createFiles = function createFiles() {
         this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.relatedTo: }') + ' not defined')); return null;
       }
       relatedTo = getObjectNameParts(schemaName, relatedTo);
-      var onDelete = getOnDelete(client, prop.onDelete || 'cascade');
+      var onDelete = getOnDelete(database, prop.onDelete || 'cascade');
       var t = [];
       t.push({ uuid: { name: entityName + 'Id' }, on: entityName, references: entityName + 'Id', onDelete: 'CASCADE' });
       t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
@@ -167,8 +167,8 @@ Generator.prototype.createFiles = function createFiles() {
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
 
-function getOnDelete(client, onDelete) {
-  switch (client) {
+function getOnDelete(database, onDelete) {
+  switch (database) {
     case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
       if (onDelete == 'clearvalue') {
         return 'SET NULL';
