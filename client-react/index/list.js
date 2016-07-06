@@ -19,26 +19,25 @@ function q(s, ctx) {
 }
 
 function build(s, theme, ctx) {
-    var lists = ctx.lists;
-    if (!Array.isArray(lists)) {
-        this.log(chalk.bold('ERR! ' + chalk.green('{ lists: }') + ' not array')); return null;
-    }
-    var mainList = _.find(lists, 'name', 'Main');
-    if (!mainList) {
-        this.log(chalk.bold('ERR! ' + chalk.green('{ lists.name == "Main" }') + ' not found')); return null;
-    }
-    if (!mainList.l) {
-        this.log(chalk.bold('ERR! ' + chalk.green('{ list.l: }') + ' not found')); return null;
-    }
     var t0 = s[0];
     t0.push(function (selector, $) {
         var elms = [];
-        _.forOwn(mainList.l, function (value, key) {
-            value.header = 'Address';
-            value.field = key;
+        var list = ctx.lists['Main'];
+        if (!list) {
+            ctx.missingList('Main');
+            return;
+        }
+        _.forOwn(list.l, function (value, key) {
+            var field = ctx.fields[key];
+            if (!field) {
+                ctx.missingField(key);
+                return;
+            }
+            value.header = field.label;
+            value.field = field.id;
             elms.push({ div: { _attr: value } })
         });
-        elms.push({ _attr: { data: '{this.props.${names}}', keyField: 'id', onSort: '{this.props.onSort}', onAction: '{this.actionHandler}' } });
+        elms.push({ _attr: { data: '{this.props.${names}}', keyField: ctx.id, onSort: '{this.props.onSort}', onAction: '{this.actionHandler}' } });
         var render = 'return (\n\
 ' + jsx({ DataGrid: elms }) + ')';
         //         var render = 'return (\n\

@@ -40,6 +40,6 @@ Generator.prototype.createFiles = function createFiles() {
 		this.composeWith('xrm:client-' + client, { options: { location: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: this.ctx } });
 	}
 	if (server != 'none') {
-		this.composeWith('xrm:server-' + server, { options: { location: new Location(dest.server), ctx: this.ctx } });
+		this.composeWith('xrm:server-' + server, { options: { location: { api: new Location(dest.api), server: new Location(dest.server) }, ctx: this.ctx } });
 	}
 };

@@ -1,4 +1,5 @@
 'use strict';
+var _ = require('lodash');
 var fs = require('fs')
 var util = require('util');
 var path = require('path');
@@ -6,6 +7,7 @@ var yeoman = require('yeoman-generator');
 var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var Location = require('./util').Location;
+var XrmParse = require('./xrm-parse');
 
 var Generator = module.exports = function Generator() {
   //debug(this._moduleName, arguments);
@@ -25,18 +27,30 @@ var Generator = module.exports = function Generator() {
     var name = null;
     try {
       var filePath = path.join(process.cwd(), a[0] + '.js');
-      name = path.basename(filePath, '.js');
+      var nameParts = getObjectNameParts(path.basename(filePath, '.js'));
       ctx = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0];
-      ctx.name = name;
+      ctx.searchPaths = [path.dirname(filePath)];
+      ctx.schemaName = nameParts[0];
+      ctx.name = nameParts[1];
       debug(this._moduleName + ' from file: ' + ctx.name);
     } catch (e) { debug('An error occured while running ' + name, e); this.log(chalk.bold(e)); }
   }
   yeoman.generators.Base.apply(this, arguments);
   this.ctx = ctx;
   this.location = location;
+  if (!ctx.Id) {
+    XrmParse.bindCtx.call(this, ctx);
+  }
 };
-
 util.inherits(Generator, yeoman.generators.NamedBase);
+
+function getObjectNameParts(objectName) {
+  var pieces = objectName.split('.');
+  if (!pieces || pieces.length === 1) {
+    return ['dbo', pieces ? pieces[0] : objectName];
+  }
+  return [pieces[0], pieces[1]];
+}
 
 // Generator.prototype._setDestinationRoot = function (subPath) {
 //   console.log('sdr:', subPath);

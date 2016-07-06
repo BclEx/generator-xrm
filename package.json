@@ -27,6 +27,7 @@
   "dependencies": {
     "chalk": "~0.4.0",
     "generator-fragment": "~0.1.0",
+    "knex": "~0.8.6",
     "lodash": "^3.10.0",
     "yeoman-generator": "^0.20.2",
     "yosay": "^0.1.0"

@@ -27,142 +27,45 @@ var Generator = module.exports = function Generator() {
 };
 util.inherits(Generator, scriptBase);
 
+var Relation = require('./index/relation');
+var Table = require('./index/table');
+var View = require('./index/view');
+
 Generator.prototype.createFiles = function createFiles() {
   debug('Defining database');
-  var ctx = this.options.ctx;
-  var schemaName = ctx.schemaName || '';
-  var schemaFolder = schemaName || 'dbo';
   var database = this.options.database || 'mssql';
-
-  // ctx
-  var entityName = ctx.name || 'entity';
-  var fields = ctx.fields;
-  if (!Array.isArray(fields)) {
-    this.log(chalk.bold('ERR! ' + chalk.green('{ fields: }') + ' not array')); return null;
-  }
+  var ctx = this.options.ctx;
+  var ctxName = ctx.name;
+  var schemaName = ctx.schemaName;
+  var schemaFolder = schemaName || 'dbo';
 
   // build content
-  var t = [];
-  t.push({ uuid: { name: entityName + 'Id' }, notNullable: true, defaultTo: 'NEWID()', primary: entityName + 'Id' });
-  t.push({ datetime: { name: 'CreateOn' }, notNullable: true });
-  t.push({ uuid: { name: 'CreateBy' }, notNullable: true });
-  t.push({ datetime: { name: 'ModifyOn' }, notNullable: true });
-  t.push({ uuid: { name: 'ModifyBy' }, notNullable: true });
-  if (ctx.hasOwnProperty('recordTypes')) {
-    t.push({ string: { name: 'RecordType', length: 160 }, notNullable: true });
-  }
-  fields.forEach(function (prop) {
-    var propName = prop.name;
-    if (!propName) {
-      this.log(chalk.bold('ERR! ' + chalk.green(entityName + '.' + propName + ': { field.name: }') + ' not defined')); return null;
-    }
-    var maxlength;
-    var defaultValue;
-    var relatedTo;
-    var onDelete;
-    if (prop.hasOwnProperty('autoNumber')) {
-      // notimplemented
-    } else if (prop.hasOwnProperty('formula')) {
-      // notimplemented
-    } else if (prop.hasOwnProperty('rollupSummary')) {
-      // notimplemented
-    } else if (prop.hasOwnProperty('lookup')) {
-      relatedTo = getObjectNameParts(schemaName, prop.lookup.relatedTo);
-      onDelete = getOnDelete(database, prop.lookup.onDelete);
-      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
-    } else if (prop.hasOwnProperty('masterDetail')) {
-      relatedTo = getObjectNameParts(schemaName, prop.masterDetail.relatedTo);
-      onDelete = getOnDelete(database, 'cascade');
-      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
-    } else if (prop.hasOwnProperty('externalLookup')) {
-      t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('checkbox')) {
-      defaultValue = prop.checkbox.defaultValue;
-      t.push({ boolean: { name: propName } });
-    } else if (prop.hasOwnProperty('currency')) {
-      t.push({ decimal: { name: propName, precision: 18, scale: 4 } });
-    } else if (prop.hasOwnProperty('date')) {
-      t.push({ date: { name: propName } });
-    } else if (prop.hasOwnProperty('dateTime')) {
-      t.push({ datetime: { name: propName } });
-    } else if (prop.hasOwnProperty('email')) {
-      t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('geolocation')) {
-      // notimplemented
-    } else if (prop.hasOwnProperty('number')) {
-      var precision = prop.number.precision || 18;
-      var scale = prop.number.scale || 0;
-      if (scale == 0) {
-        t.push({ integer: { name: propName } });
-      } else {
-        t.push({ decimal: { name: propName, precision: precision, scale: scale } });
-      }
-    } else if (prop.hasOwnProperty('percent')) {
-      t.push({ decimal: { name: propName, precision: 18, scale: scale } });
-    } else if (prop.hasOwnProperty('phone')) {
-      t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('picklist')) {
-      t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('picklistMulti')) {
-      t.push({ string: { name: propName } });
-    } else if (prop.hasOwnProperty('text')) {
-      maxlength = prop.text.length;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('textArea')) {
-      maxlength = prop.textArea.length;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('textAreaLong')) {
-      maxlength = prop.textAreaLong.length;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('textAreaRich')) {
-      maxlength = prop.textAreaRich.length;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('textEncrypted')) {
-      maxlength = prop.textEncrypted.length;
-      t.push({ string: { name: propName, length: maxlength } });
-    } else if (prop.hasOwnProperty('url')) {
-      t.push({ string: { name: propName } });
-    } else {
-      this.log(chalk.bold('ERR! ' + chalk.green(entityName + '.' + propName + ': { field.prop: }') + ' not matched')); return null;
-    }
-  }.bind(this));
-
   var location = this.location || new Location();
+  var s0 = Table.build.call(this, database, ctx);
   var sqlCtx = {
-    _name: entityName,
-    _file: location.getEnsuredPath(schemaFolder + '/Tables', entityName + '.sql'),
+    _name: ctxName,
+    _file: location.getEnsuredPath(schemaFolder + '/Tables', ctxName + '.sql'),
     _client: database,
-    createTable: { schemaName: schemaName, createTable: entityName, t: t }
+    createTable: { schemaName: schemaName, createTable: ctxName, t: s0 }
   };
+  var children = sqlCtx._children = [];
   if (ctx.hasOwnProperty('relations')) {
-    var relations = ctx.relations;
-    if (!Array.isArray(relations)) {
-      this.log(chalk.bold('ERR! ' + chalk.green('{ relations: }') + ' not array')); return null;
-    }
-    var children = sqlCtx._children = [];
-    relations.forEach(function (prop) {
-
-      var propName = prop.name;
-      if (!propName) {
-        this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.name: }') + ' not defined')); return null;
-      }
-      var relatedTo = prop.relatedTo;
-      if (!relatedTo) {
-        this.log(chalk.bold('ERR! ' + chalk.green(entityName + ': { relation.relatedTo: }') + ' not defined')); return null;
-      }
-      relatedTo = getObjectNameParts(schemaName, relatedTo);
-      var onDelete = getOnDelete(database, prop.onDelete || 'cascade');
-      var t = [];
-      t.push({ uuid: { name: entityName + 'Id' }, on: entityName, references: entityName + 'Id', onDelete: 'CASCADE' });
-      t.push({ uuid: { name: propName + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
-      t.push({ primary: [entityName + 'Id', propName + 'Id'] });
+    _.forEach(ctx.relations, function (x) {
+      var name = x.name;
+      var s1 = Relation.build.call(this, database, ctx, x);
       children.push({
-        _name: entityName + '_' + propName,
-        _file: location.getEnsuredPath(schemaFolder + '/Tables', entityName + '_' + propName + '.sql'),
-        createTable: { schemaName: schemaName, createTable: entityName + '_' + propName, t: t }
+        _name: ctxName + '_' + name,
+        _file: location.getEnsuredPath(schemaFolder + '/Tables', ctxName + '_' + name + '.sql'),
+        createTable: { schemaName: schemaName, createTable: ctxName + '_' + name, t: s1 }
       });
     });
   }
+  var s2 = View.build.call(this, database, ctx, schemaName);
+  children.push({
+    _name: ctxName + 'View',
+    _file: location.getEnsuredPath(schemaFolder + '/Views', ctxName + 'View.sql'),
+    createTable: { schemaName: schemaName, createView: ctxName + 'View', t: s2 }
+  });
   // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
@@ -178,15 +81,4 @@ function getOnDelete(database, onDelete) {
       return null; // dontallow
   }
   return null;
-}
-
-function getObjectNameParts(schemaName, objectName) {
-  var pieces = undefined;
-  if (_.isString(objectName)) {
-    pieces = objectName.split('.');
-  }
-  if (!pieces || pieces.length === 1) {
-    return [schemaName + '.', pieces ? pieces[0] : objectName];
-  }
-  return [pieces[0] + '.', pieces[1]];
 }

@@ -41,74 +41,66 @@ var Service = require('./index/service');
 Generator.prototype.createFiles = function createFiles() {
     debug('Defining client');
     var ctx = this.options.ctx;
-
-    // ctx
-    var entityName = ctx.name = ctx.name || 'entity';
-    var fields = ctx.fields;
-    if (!Array.isArray(fields)) {
-        this.log(chalk.bold('ERR! ' + chalk.green('{ fields: }') + ' not array')); return null;
-    }
+    var ctxName = ctx.name;
 
     // build content
-    var theme = new Theme(entityName, this.log);
-    //theme.buildAllElements(s, fields);
-
+    var theme = new Theme(ctxName, this.log);
     var location = this.location || { html: null, js: null, css: null };
     var locationJs = location.js || new Location();
     var s0 = [[], []];
     Home.build.call(this, s0, theme, ctx);
     var jsCtx = {
-        _name: entityName,
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'Home.js'),
+        _name: ctxName,
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'Home.js'),
         js: { append: s0[0] }
     };
     var children = jsCtx._children = [];
     var s1 = [[], []];
     Form.build.call(this, s1, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'Form.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'Form.js'),
         js: { append: s1[0] }
     });
     var s2 = [[], []];
     List.build.call(this, s2, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'List.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'List.js'),
         js: { append: s2[0] }
     });
     var s3 = [[], []];
     Lookup.build.call(this, s3, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'Lookup.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'Lookup.js'),
         js: { append: s3[0] }
     });
     var s4 = [[], []];
     QuickFind.build.call(this, s4, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'QuickFind.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'QuickFind.js'),
         js: { append: s4[0] }
     });
     var s5 = [[], []];
     Record.build.call(this, s5, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'Record.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'Record.js'),
         js: { append: s5[0] }
     });
     var s6 = [[], []];
     View.build.call(this, s6, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, entityName + 'View.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, ctxName + 'View.js'),
         js: { append: s6[0] }
     });
     var s7 = [[], []];
     NewWindow.build.call(this, s7, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/' + entityName, 'New' + entityName + 'Window.js'),
+        _file: locationJs.getEnsuredPath('src/' + ctxName, 'New' + ctxName + 'Window.js'),
         js: { append: s7[0] }
     });
     var s8 = [[], []];
     Service.build.call(this, s8, theme, ctx);
     children.push({
-        _file: locationJs.getEnsuredPath('src/_services', entityName + 'Service.js'),
+        _file: locationJs.getEnsuredPath('src/_services', ctxName + 'Service.js'),
         js: { append: s8[0] }
     });
 

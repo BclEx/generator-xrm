@@ -1,8 +1,8 @@
 Description:
-    Creates a new Database fragment.
+    Creates a new Server fragment.
 
 Example:
     yo fragment:knex thing
 
     This will create:
-        ./thing.sql
+        ./thing.cs
