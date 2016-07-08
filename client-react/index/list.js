@@ -24,13 +24,13 @@ function build(s, theme, ctx) {
         var elms = [];
         var list = ctx.lists['Main'];
         if (!list) {
-            ctx.missingList('Main');
+            ctx.missingList('Main', 'react-list');
             return;
         }
         _.forOwn(list.l, function (value, key) {
             var field = ctx.fields[key];
             if (!field) {
-                ctx.missingField(key);
+                ctx.missingField(key, 'react-list');
                 return;
             }
             value.header = field.label;

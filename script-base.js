@@ -11,6 +11,7 @@ var XrmParse = require('./xrm-parse');
 
 var Generator = module.exports = function Generator() {
   //debug(this._moduleName, arguments);
+  console.log(this);
   var ctx = {};
   var location = null;
   var a = arguments[0];

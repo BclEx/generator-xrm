@@ -36,7 +36,7 @@ function build(ctx, usings) {
         if (x.hasOwnProperty('autoNumber')) {
             // notimplemented
         } else if (x.hasOwnProperty('formula')) {
-            // notimplemented
+            // skip
         } else if (x.hasOwnProperty('rollupSummary')) {
             // notimplemented
         } else if (x.hasOwnProperty('lookup')) {
@@ -65,7 +65,7 @@ function build(ctx, usings) {
         } else if (x.hasOwnProperty('number')) {
             var scale = x.number.scale || 0;
             if (scale == 0) {
-                t.push({ integer: { name: x.Id }, attribute: [{ DisplayName: label }] });
+                t.push({ int: { name: x.Id }, attribute: [{ DisplayName: label }] });
             } else {
                 t.push({ decimal: { name: x.Id }, attribute: [{ DisplayName: label }] });
             }

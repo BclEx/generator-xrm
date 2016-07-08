@@ -33,7 +33,7 @@ function build(database, ctx) {
     if (x.hasOwnProperty('autoNumber')) {
       // notimplemented
     } else if (x.hasOwnProperty('formula')) {
-      // notimplemented
+      t.push({ formula: { name: x.Id, sql: x.formula.sql, persistant: x.formula.persistant || false } });
     } else if (x.hasOwnProperty('rollupSummary')) {
       // notimplemented
     } else if (x.hasOwnProperty('lookup')) {
@@ -114,5 +114,5 @@ function getOnDelete(database, onDelete) {
 }
 
 module.exports = {
-    build: build,
+  build: build,
 };

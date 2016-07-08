@@ -28,13 +28,13 @@ function build(s, ctx, database) {
     var elms1 = [ctx.Id];
     var list = ctx.lists['Main'];
     if (!list) {
-        ctx.missingList('Main');
+        ctx.missingList('Main', 'aspnet-repository');
         return;
     }
     _.forOwn(list.l, function (value, key) {
         var field = ctx.fields[key];
         if (!field) {
-            ctx.missingField(key);
+            ctx.missingField(key, 'aspnet-repository');
             return;
         }
         elms1.push(field.Id + ' as ' + field.name)

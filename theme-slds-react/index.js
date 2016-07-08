@@ -54,9 +54,6 @@ Theme.prototype.buildForm = function buildForm(s, body) {
 
 Theme.prototype.buildElement = function buildElement(s, prop) {
     var propName = prop.name;
-    if (!propName) {
-        this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + ': { field.name: }') + ' not defined')); return false;
-    }
 
     // build content
     var t1 = s[0];

@@ -2,16 +2,21 @@
 var _ = require('lodash');
 var fs = require('fs')
 var path = require('path');
-var debug = require('debug')('generator:xrm');
+var debug = require('debug')('generator:xrm-parse');
 var chalk = require('chalk');
 var g_cache = [];
 
 // bind-ctx
 function bindCtx(ctx) {
+  debug('CTX: ' + ctx.name);
   _.extend(ctx, CtxMethods);
   ctx.root = this;
   ctx.log = this.log;
   ctx.searchPaths = ctx.searchPaths || [process.cwd()];
+  if (this.options.hasOwnProperty('searchPaths')) {
+    ctx.searchPaths = ctx.searchPaths.concat(this.options.searchPaths);
+  }
+
   ctx.schemaName = ctx.schemaName || '';
   ctx.name = ctx.name || 'entity';
   ctx.id = _.camelCase(ctx.Id = ctx.name + 'Id');
@@ -20,7 +25,7 @@ function bindCtx(ctx) {
   // relations
   if (ctx.hasOwnProperty('relations')) {
     if (!_.isArray(ctx.relations)) {
-      this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { relations: }') + ' not array'));
+      this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { relations: }') + ' not array'));
       return null;
     }
     for (var i = 0; i < ctx.relations.length; ++i) {
@@ -33,20 +38,20 @@ function bindCtx(ctx) {
   var fields = {
     // EntityId
     CreatedOn: bindField.call(ctx, { label: 'Created On', name: 'CreatedOn', datetime: {} }, 1),
-    CreatedBy: bindField.call(ctx, { label: 'Created By', name: 'CreatedBy', lookup: { relatedTo: 'SystemUser' } }, 1),
+    CreatedBy: bindField.call(ctx, { label: 'Created By', name: 'CreatedBy', lookup: { relatedTo: 'dbo.SystemUser' } }, 1),
     ModifiedOn: bindField.call(ctx, { label: 'Modified On', name: 'ModifiedOn', datetime: {} }, 1),
-    ModifiedBy: bindField.call(ctx, { label: 'Modified By', name: 'ModifiedBy', lookup: { relatedTo: 'SystemUser' } }, 1),
+    ModifiedBy: bindField.call(ctx, { label: 'Modifier By', name: 'ModifiedBy', lookup: { relatedTo: 'dbo.SystemUser' } }, 1),
   };
   if (ctx.hasOwnProperty('recordTypes')) {
     if (!_.isArray(ctx.recordTypes)) {
-      this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { recordTypes: }') + ' not array'));
+      this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { recordTypes: }') + ' not array'));
       return null;
     }
     fields['RecordType'] = bindField.call(ctx, { label: 'Record Type', name: 'RecordType', picklist: { values: ctx.recordTypes, length: 160, defaultFirst: true } }, 1);
   }
   //
   if (!_.isArray(ctx.fields)) {
-    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { fields: }') + ' not array'));
+    // this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' not array'));
     return null;
   }
   for (var i = 0; i < ctx.fields.length; ++i) {
@@ -57,7 +62,7 @@ function bindCtx(ctx) {
   // layouts
   var layouts = {};
   if (!_.isArray(ctx.layouts)) {
-    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { layouts: }') + ' not array'));
+    this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { layouts: }') + ' not array'));
     return null;
   }
   for (var i = 0; i < ctx.layouts.length; ++i) {
@@ -69,7 +74,7 @@ function bindCtx(ctx) {
   // lists
   var lists = {};
   if (!_.isArray(ctx.lists)) {
-    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { lists: }') + ' not array'));
+    this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { lists: }') + ' not array'));
     return null;
   }
   for (var i = 0; i < ctx.lists.length; ++i) {
@@ -80,6 +85,7 @@ function bindCtx(ctx) {
 }
 var CtxMethods = {
   getCtx: function getCtx(name) {
+    debug('getCtx: ' + name);
     var parts = getObjectNameParts(this.schemaName, name);
     if (g_cache.hasOwnProperty(parts[0] + parts[1])) {
       return g_cache[parts[0] + parts[1]];
@@ -87,6 +93,7 @@ var CtxMethods = {
     var ctx = loadCtx.call(this.root, parts);
     if (!ctx) {
       console.log('Unable to load ' + name);
+      g_cache[parts[0] + parts[1]] = null;
       return null;
     }
     return ctx;
@@ -96,14 +103,14 @@ var CtxMethods = {
       return (value.flag & flag) != 0;
     });
   },
-  missingField: function missingField(name) {
-    this.log(chalk.bold('ERR! ' + chalk.green('field[' + name + ']') + ' not found'));
+  missingField: function missingField(name, location) {
+    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': ' + location + '.field[' + name + ']') + ' not found'));
   },
-  missingLayout: function missingLayout(name) {
-    this.log(chalk.bold('ERR! ' + chalk.green('layout[' + name + ']') + ' not found'));
+  missingLayout: function missingLayout(name, location) {
+    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': ' + location + '.layout[' + name + ']') + ' not found'));
   },
-  missingList: function missingList(name) {
-    this.log(chalk.bold('ERR! ' + chalk.green('list[' + name + ']') + ' not found'));
+  missingList: function missingList(name, location) {
+    this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': ' + location + '.list[' + name + ']') + ' not found'));
   },
   getLayouts: function getLayouts() {
     return this.layouts;
@@ -114,11 +121,14 @@ var CtxMethods = {
   getDisplayField: function getDisplayField() {
     var foundId = 0; var foundField = null;
     _.forEach(this.fields, function (field) {
+      var key = (field.name || '').toLowerCase();
       if (field.hasOwnProperty('display')) {
+        foundId = 4; foundField = field;
+      } else if (foundId < 4 && (key === 'name' || key === 'fullname')) {
         foundId = 3; foundField = field;
-      } else if (foundId < 3 && field.name == 'Name') {
+      } else if (foundId < 3 && key === 'title') {
         foundId = 2; foundField = field;
-      } else if (foundId < 2 && field.name == 'Title') {
+      } else if (foundId < 2 && key === 'number') {
         foundId = 1; foundField = field;
       }
     });
@@ -129,6 +139,7 @@ var CtxMethods = {
 
 // bind-relation
 function bindRelation(relation) {
+  debug('relation: ' + relation.name);
   if (!relation.name) {
     this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { relation.name: }') + ' not defined'));
     return null;
@@ -147,6 +158,7 @@ var RelationMethods = {
 
 // bind-field
 function bindField(field, flag) {
+  debug('field: ' + field.name);
   if (!field.name) {
     this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { field.name: }') + ' not defined'));
     return null;
@@ -170,6 +182,7 @@ var FieldMethods = {
 
 // bind-layout
 function bindLayout(layout) {
+  debug('layout: ' + layout.name);
   if (!layout.name) {
     this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { layout.name: }') + ' not defined'));
     return null;
@@ -184,6 +197,7 @@ var LayoutMethods = {
 
 // bind-list
 function bindList(list) {
+  debug('list: ' + list.name);
   if (!list.name) {
     this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { list.name: }') + ' not defined'));
     return null;

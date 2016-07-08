@@ -23,7 +23,7 @@ function build(database, ctx, schemaName) {
       if (x.hasOwnProperty('lookup') || x.hasOwnProperty('masterDetail')) {
         relatedTo = (x.hasOwnProperty('lookup') ? x.lookup.relatedTo : x.masterDetail.relatedTo);
         var displayName = 'Name';
-        var relatedToCtx = ctx.getCtx(relatedTo[1]);
+        var relatedToCtx = ctx.getCtx(relatedTo[0] + relatedTo[1]);
         if (relatedToCtx) {
           var displayField = relatedToCtx.getDisplayField();
           displayName = (displayField ? displayField.name : 'Name');
@@ -33,7 +33,6 @@ function build(database, ctx, schemaName) {
         v = v.leftJoin(relatedTo[0] + relatedTo[1] + ' as ' + alias, function () {
           this.on(ctxName + '.' + x.Id, '=', alias + '.' + relatedTo[1] + 'Id')
         });
-      } else {
       }
     }.bind(this));
     return v.select(t);
