@@ -56,7 +56,10 @@ function bindCtx(ctx) {
   }
   for (var i = 0; i < ctx.fields.length; ++i) {
     var field = ctx.fields[i];
-    fields[field.name] = bindField.call(ctx, field, 2);
+    if (field == null)
+      this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' {null} field @row:' + i));
+    else
+      fields[field.name] = bindField.call(ctx, field, 2);
   }
   ctx.fields = fields;
   // layouts

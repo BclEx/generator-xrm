@@ -18,7 +18,7 @@ var Location = require('../util').Location;
 var Generator = module.exports = function Generator() {
 	this._moduleName = 'xrm:app';
 	scriptBase.apply(this, arguments);
-	//this.conflicter.force = true;
+	this.conflicter.force = true;
 	var done = this.async();
 	this.on('end', function () {
 		done();

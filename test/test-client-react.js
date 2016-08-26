@@ -3,8 +3,8 @@
 var fs = require('fs');
 var path = require('path');
 var yeoman = require('yeoman-generator');
-var helpers = require('yeoman-generator').test;
-var assert = require('yeoman-generator').assert;
+var helpers = require('yeoman-test');
+var assert = require('yeoman-assert');
 
 describe('client-react test', function () {
 
@@ -16,7 +16,7 @@ describe('client-react test', function () {
   };
 
   var createDummyGenerator = function () {
-    return yeoman.generators.Base.extend({
+    return yeoman.Base.extend({
       clientReact: function () {
         xrm.ctx = this.options.ctx;
       }

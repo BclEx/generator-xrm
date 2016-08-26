@@ -11,7 +11,7 @@ var XrmParse = require('./xrm-parse');
 
 var Generator = module.exports = function Generator() {
   //debug(this._moduleName, arguments);
-  console.log(this);
+  //console.log(this);
   var ctx = {};
   var location = null;
   var a = arguments[0];
@@ -36,14 +36,14 @@ var Generator = module.exports = function Generator() {
       debug(this._moduleName + ' from file: ' + ctx.name);
     } catch (e) { debug('An error occured while running ' + name, e); this.log(chalk.bold(e)); }
   }
-  yeoman.generators.Base.apply(this, arguments);
+  yeoman.Base.apply(this, arguments);
   this.ctx = ctx;
   this.location = location;
   if (!ctx.Id) {
     XrmParse.bindCtx.call(this, ctx);
   }
 };
-util.inherits(Generator, yeoman.generators.NamedBase);
+util.inherits(Generator, yeoman.Base);
 
 function getObjectNameParts(objectName) {
   var pieces = objectName.split('.');
