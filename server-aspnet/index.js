@@ -12,13 +12,13 @@
 var util = require('util');
 var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
-var debug = require('debug')('generator:xrm');
+var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var Location = require('../util').Location;
 var _ = require('lodash');
 
 var Generator = module.exports = function Generator() {
-  this._moduleName = 'xrm:server-aspnet';
+  this._moduleName = 'xrm-core:server-aspnet';
   scriptBase.apply(this, arguments);
   var done = this.async();
   this.on('end', function () {
@@ -34,7 +34,7 @@ var ServiceRepository = require('./index/service-repository');
 
 Generator.prototype.createFiles = function createFiles() {
   debug('Defining server');
-  var ctx = this.options.ctx;
+  var ctx = this.getCtx(this.options.ctx || this.ctx);
   var ctxName = ctx.name;
   var schemaName = 'CORE.Site';
 

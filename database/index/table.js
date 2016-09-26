@@ -82,7 +82,7 @@ function build(database, ctx) {
         t.push({ decimal: { name: x.Id, precision: precision, scale: scale } });
       }
     } else if (x.hasOwnProperty('percent')) {
-      var scale2 = x.number.scale || 0;
+      var scale2 = x.percent.scale || 0;
       t.push({ decimal: { name: x.Id, precision: 18, scale: scale2 } });
     } else if (x.hasOwnProperty('phone')) {
       t.push({ string: { name: x.Id } });

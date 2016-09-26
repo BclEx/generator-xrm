@@ -76,7 +76,6 @@ function bindLayout(layout) {
   return layout;
 }
 
-
 // bind-list
 var ListMethods = {
 };
@@ -137,7 +136,7 @@ var CtxMethods = {
     return ctx;
   },
   getFields: function getFields(flag) {
-    return _.pick(this.fields, function (value, key) {
+    return _.filter(this.fields, function (value, key) {
       return (value.flag & flag) !== 0;
     });
   },
@@ -216,38 +215,44 @@ function bindCtx(ctx) { // jshint ignore:line
     }
     fields['RecordType'] = bindField.call(ctx, { label: 'Record Type', name: 'RecordType', picklist: { values: ctx.recordTypes, length: 160, defaultFirst: true } }, 1);
   }
-  //
-  if (!_.isArray(ctx.fields)) {
-    // this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' not array'));
-    return null;
-  }
-  for (var i2 = 0; i2 < ctx.fields.length; ++i2) {
-    var field = ctx.fields[i2];
-    if (field == null) { this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' {null} field @row:' + i2)); }
-    else { fields[field.name] = bindField.call(ctx, field, 2); }
+  if (ctx.fields) {
+    if (!_.isArray(ctx.fields)) {
+      // this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' not array'));
+      return null;
+    }
+    for (var i2 = 0; i2 < ctx.fields.length; ++i2) {
+      var field = ctx.fields[i2];
+      if (field == null) { this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { fields: }') + ' {null} field @row:' + i2)); }
+      else { fields[field.name] = bindField.call(ctx, field, 2); }
+    }
   }
   ctx.fields = fields;
+
   // layouts
   var layouts = {};
-  if (!_.isArray(ctx.layouts)) {
-    this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { layouts: }') + ' not array'));
-    return null;
-  }
-  for (var i3 = 0; i3 < ctx.layouts.length; ++i3) {
-    var layout = ctx.layouts[i3];
-    layouts[layout.name] = bindLayout.call(ctx, layout);
+  if (ctx.layouts) {
+    if (!_.isArray(ctx.layouts)) {
+      this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { layouts: }') + ' not array'));
+      return null;
+    }
+    for (var i3 = 0; i3 < ctx.layouts.length; ++i3) {
+      var layout = ctx.layouts[i3];
+      layouts[layout.name] = bindLayout.call(ctx, layout);
+    }
   }
   ctx.layouts = layouts;
 
   // lists
   var lists = {};
-  if (!_.isArray(ctx.lists)) {
-    this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { lists: }') + ' not array'));
-    return null;
-  }
-  for (var i4 = 0; i4 < ctx.lists.length; ++i4) {
-    var list = ctx.lists[i4];
-    lists[list.name] = bindList.call(ctx, list);
+  if (ctx.lists) {
+    if (!_.isArray(ctx.lists)) {
+      this.log(chalk.bold('ERR! ' + chalk.green(ctx.name + ': { lists: }') + ' not array'));
+      return null;
+    }
+    for (var i4 = 0; i4 < ctx.lists.length; ++i4) {
+      var list = ctx.lists[i4];
+      lists[list.name] = bindList.call(ctx, list);
+    }
   }
   ctx.lists = lists;
 }

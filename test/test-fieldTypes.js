@@ -33,7 +33,7 @@ describe('fieldTypes test', function () {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm:database', deps, [], genOptions);
+        xrm = helpers.createGenerator('xrm-core:database', deps, [], genOptions);
         done();
       });
     });

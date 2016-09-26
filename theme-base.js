@@ -1,5 +1,5 @@
 'use strict';
-var debug = require('debug')('generator:xrm');
+var debug = require('debug')('generator:xrm-core');
 
 var Theme = module.exports = function Theme() {
     this.entityName = arguments[0];

@@ -18,7 +18,7 @@ describe('app test', function () {
   var createDummyGenerator = function () {
     return yeoman.Base.extend({
       app: function () {
-        //xrm.ctx = this.options.ctx;
+        xrm.ctx = this.options.ctx;
       }
     });
   };
@@ -26,8 +26,9 @@ describe('app test', function () {
   describe('main', function () {
     before(function (done) {
       var deps = [
-        '../app', '../database', '../client-angular', '../server-aspnet',
+        '../app', '../database', '../client-react', '../server-aspnet',
         [createDummyGenerator(), 'fragment:html'],
+        [createDummyGenerator(), 'fragment:cs'],
         [createDummyGenerator(), 'fragment:css'],
         [createDummyGenerator(), 'fragment:js'],
         [createDummyGenerator(), 'fragment:sql']
@@ -36,7 +37,7 @@ describe('app test', function () {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm:app', deps, [], genOptions);
+        xrm = helpers.createGenerator('xrm-core:app', deps, [], genOptions);
         done();
       });
     });
@@ -48,18 +49,21 @@ describe('app test', function () {
           name: 'Name',
           text: { maxlength: 150 }
         }, {
-          label: 'Category',
-          name: 'Category',
-          picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
-        }, {
-          label: 'Metadata',
-          name: 'Metadata',
-          text: { maxlength: 2000 }
+            label: 'Category',
+            name: 'Category',
+            picklist: { values: ['Creative', 'Ideation', 'Implementation', 'Production', 'Support', 'Administrative', 'Other'] }
+          }, {
+            label: 'Metadata',
+            name: 'Metadata',
+            text: { maxlength: 2000 }
+          }],
+        lists: [{
+          name: 'Main',
+          l: { Name: { sortable: '{true}' } },
         }]
       };
-      xrm.ctx = xrm.options.ctx;
       xrm.run(function () {
-        console.log(this.ctx);
+        //console.log(this.ctx);
         done();
       }.bind(xrm));
     });

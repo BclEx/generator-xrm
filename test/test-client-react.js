@@ -35,7 +35,7 @@ describe('client-react test', function () {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm:client-react', deps, [], genOptions);
+        xrm = helpers.createGenerator('xrm-core:client-react', deps, [], genOptions);
         done();
       });
     });
@@ -57,7 +57,7 @@ describe('client-react test', function () {
           }]
       };
       xrm.run(function () {
-        console.log(this.ctx);
+        //console.log(this.ctx);
         done();
       }.bind(xrm));
     });

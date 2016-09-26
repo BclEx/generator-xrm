@@ -12,14 +12,14 @@
 var util = require('util');
 var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
-var debug = require('debug')('generator:xrm');
+var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var Location = require('../util').Location;
 var _ = require('lodash');
 var Theme = require('../theme-slds-react');
 
 var Generator = module.exports = function Generator() {
-    this._moduleName = 'xrm:client-react';
+    this._moduleName = 'xrm-core:client-react';
     scriptBase.apply(this, arguments);
     var done = this.async();
     this.on('end', function () {
@@ -40,7 +40,7 @@ var Service = require('./index/service');
 
 Generator.prototype.createFiles = function createFiles() {
     debug('Defining client');
-    var ctx = this.options.ctx;
+    var ctx = this.getCtx(this.options.ctx || this.ctx);
     var ctxName = ctx.name;
 
     // build content

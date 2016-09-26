@@ -33,7 +33,7 @@ describe('database test', function () {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm:database', deps, [], genOptions);
+        xrm = helpers.createGenerator('xrm-core:database', deps, [], genOptions);
         done();
       });
     });
@@ -55,17 +55,17 @@ describe('database test', function () {
           }]
       };
       xrm.run(function () {
-        console.log(this.ctx);
+        //console.log(this.ctx);
         var a = this.ctx.createTable;
         assert(a.createTable === 'test');
         assert(Array.isArray(a.t));
         var t = a.t;
-        // console.log(t[0]);
+        //console.log(t[2]);
         assert(t[0].uuid.name === 'testId');
-        assert(t[1].datetime.name === 'CreateOn');
-        assert(t[2].uuid.name === 'CreateBy');
-        assert(t[3].datetime.name === 'ModifyOn');
-        assert(t[4].uuid.name === 'ModifyBy');
+        assert(t[1].datetime.name === 'CreatedOn');
+        assert(t[2].uuid.name === 'CreatedById');
+        assert(t[3].datetime.name === 'ModifiedOn');
+        assert(t[4].uuid.name === 'ModifiedById');
         assert(t[5].string.name === 'Name');
         assert(t[6].string.name === 'Category');
         assert(t[7].string.name === 'Metadata');
@@ -83,17 +83,17 @@ describe('database test', function () {
         }]
       };
       xrm.run(function () {
-        console.log(this.ctx);
+        //console.log(this.ctx);
         var a = this.ctx.createTable;
         assert(a.createTable === 'test');
         assert(Array.isArray(a.t));
         var t = a.t;
         // console.log(t[0]);
         assert(t[0].uuid.name === 'testId');
-        assert(t[1].datetime.name === 'CreateOn');
-        assert(t[2].uuid.name === 'CreateBy');
-        assert(t[3].datetime.name === 'ModifyOn');
-        assert(t[4].uuid.name === 'ModifyBy');
+        assert(t[1].datetime.name === 'CreatedOn');
+        assert(t[2].uuid.name === 'CreatedById');
+        assert(t[3].datetime.name === 'ModifiedOn');
+        assert(t[4].uuid.name === 'ModifiedById');
         assert(t[5].string.name === 'RecordType');
         assert(t[6].string.name === 'Name');
         done();
@@ -114,17 +114,17 @@ describe('database test', function () {
         }]
       };
       xrm.run(function () {
-        console.log(this.ctx);
+        //console.log(this.ctx);
         var a = this.ctx.createTable;
         assert(a.createTable === 'test');
         assert(Array.isArray(a.t));
         var t = a.t;
         // console.log(t[0]);
         assert(t[0].uuid.name === 'testId');
-        assert(t[1].datetime.name === 'CreateOn');
-        assert(t[2].uuid.name === 'CreateBy');
-        assert(t[3].datetime.name === 'ModifyOn');
-        assert(t[4].uuid.name === 'ModifyBy');
+        assert(t[1].datetime.name === 'CreatedOn');
+        assert(t[2].uuid.name === 'CreatedById');
+        assert(t[3].datetime.name === 'ModifiedOn');
+        assert(t[4].uuid.name === 'ModifiedById');
         assert(t[5].string.name === 'Name');
         done();
       }.bind(xrm));

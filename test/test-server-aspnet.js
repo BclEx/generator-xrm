@@ -6,7 +6,7 @@ var yeoman = require('yeoman-generator');
 var helpers = require('yeoman-test');
 var assert = require('yeoman-assert');
 
-describe('client-angular test', function () {
+describe('server-aspnet test', function () {
 
   var xrm, genOptions = {
     'appPath': 'app',
@@ -17,7 +17,7 @@ describe('client-angular test', function () {
 
   var createDummyGenerator = function () {
     return yeoman.Base.extend({
-      clientAngular: function () {
+      serverAspNet: function () {
         xrm.ctx = this.options.ctx;
       }
     });
@@ -26,16 +26,14 @@ describe('client-angular test', function () {
   describe('main', function () {
     before(function (done) {
       var deps = [
-        '../client-angular',
-        [createDummyGenerator(), 'fragment:html'],
-        [createDummyGenerator(), 'fragment:css'],
-        [createDummyGenerator(), 'fragment:js']
+        '../server-aspnet',
+        [createDummyGenerator(), 'fragment:cs']
       ];
       helpers.testDirectory(path.join(__dirname, '../tmp'), function (err) {
         if (err) {
           done(err);
         }
-        xrm = helpers.createGenerator('xrm-core:client-angular', deps, [], genOptions);
+        xrm = helpers.createGenerator('xrm-core:server-aspnet', deps, [], genOptions);
         done();
       });
     });
@@ -54,7 +52,11 @@ describe('client-angular test', function () {
             label: 'Metadata',
             name: 'Metadata',
             text: { maxlength: 2000 }
-          }]
+          }],
+        lists: [{
+          name: 'Main',
+          l: { Name: { sortable: '{true}' } },
+        }]
       };
       xrm.run(function () {
         //console.log(this.ctx);

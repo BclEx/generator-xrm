@@ -12,14 +12,14 @@
 var util = require('util');
 var scriptBase = require('../script-base.js');
 var yeoman = require('yeoman-generator');
-var debug = require('debug')('generator:xrm');
+var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var Location = require('../util').Location;
 var _ = require('lodash');
 var Theme = require('../theme-slds-angular');
 
 var Generator = module.exports = function Generator() {
-    this._moduleName = 'xrm:client-angular';
+    this._moduleName = 'xrm-core:client-angular';
     scriptBase.apply(this, arguments);
     var done = this.async();
     this.on('end', function () {
@@ -30,19 +30,16 @@ util.inherits(Generator, scriptBase);
 
 Generator.prototype.createFiles = function createFiles() {
     debug('Defining client');
-    var ctx = this.options.ctx;
+    var ctx = this.getCtx(this.options.ctx || this.ctx);
 
     // ctx
     var entityName = ctx.name || 'entity';
-    var fields = ctx.fields;
-    if (!Array.isArray(fields)) {
-        this.log(chalk.bold('ERR! ' + chalk.green('{ fields: }') + ' not array')); return null;
-    }
+    var fields = ctx.getFields(2);
 
     // build content
     var s = [[], [], []];
     var theme = new Theme(entityName, this.log);
-    theme.buildAllElements(s, fields);
+    //theme.buildAllElements(s, fields);
 
     var location = this.location || { html: null, js: null, css: null };
     var locationHtml = location.html || new Location();
@@ -69,7 +66,7 @@ Generator.prototype.createFiles = function createFiles() {
         css: {}
     };
     //console.log(htmlCtx);
-    this.composeWith('fragment:html', { options: { ctx: htmlCtx } });
+    //this.composeWith('fragment:html', { options: { ctx: htmlCtx } });
     //this.composeWith('fragment:js', { options: { ctx: jsCtx } });
     //this.composeWith('fragment:css', { options: { ctx: cssCtx } });
 };
