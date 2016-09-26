@@ -1,6 +1,6 @@
 'use strict';
 var _ = require('lodash');
-var fs = require('fs')
+var fs = require('fs');
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
@@ -8,6 +8,14 @@ var debug = require('debug')('generator:xrm');
 var chalk = require('chalk');
 var Location = require('./util').Location;
 var XrmParse = require('./xrm-parse');
+
+function getObjectNameParts(objectName) {
+  var pieces = objectName.split('.');
+  if (!pieces || pieces.length === 1) {
+    return ['dbo', pieces ? pieces[0] : objectName];
+  }
+  return [pieces[0], pieces[1]];
+}
 
 var Generator = module.exports = function Generator() {
   //debug(this._moduleName, arguments);
@@ -20,7 +28,7 @@ var Generator = module.exports = function Generator() {
     ctx = a.ctx || {};
     location = a.location;
     debug(this._moduleName + ' from parent: ' + ctx.name);
-  } else if (typeof a[0] != 'string') {
+  } else if (typeof a[0] !== 'string') {
     ctx = a[0] || {};
     arguments[0].shift();
     debug(this._moduleName + ' from ctx: ' + ctx.name);
@@ -29,7 +37,7 @@ var Generator = module.exports = function Generator() {
     try {
       var filePath = path.join(process.cwd(), a[0] + '.js');
       var nameParts = getObjectNameParts(path.basename(filePath, '.js'));
-      ctx = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0];
+      ctx = eval('[' + fs.readFileSync(filePath, 'utf8') + ']')[0]; // jshint ignore:line
       ctx.searchPaths = [path.dirname(filePath)];
       ctx.schemaName = nameParts[0];
       ctx.name = nameParts[1];
@@ -45,13 +53,6 @@ var Generator = module.exports = function Generator() {
 };
 util.inherits(Generator, yeoman.Base);
 
-function getObjectNameParts(objectName) {
-  var pieces = objectName.split('.');
-  if (!pieces || pieces.length === 1) {
-    return ['dbo', pieces ? pieces[0] : objectName];
-  }
-  return [pieces[0], pieces[1]];
-}
 
 // Generator.prototype._setDestinationRoot = function (subPath) {
 //   console.log('sdr:', subPath);

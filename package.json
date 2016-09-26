@@ -1,12 +1,12 @@
 {
-  "name": "generator-xrm",
+  "name": "generator-xrm-core",
   "version": "0.1.0",
   "description": "A Yeoman generator for xrm",
   "license": "MIT",
   "main": "app/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/BclEx/generator-xrm"
+    "url": "git://github.com/BclEx/generator-xrm-core"
   },
   "author": {
     "name": "BclEx",
@@ -35,14 +35,19 @@
   },
   "devDependencies": {
     "bluebird": "^3.4.3",
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-simple-mocha": "^0.4.1",
+    "jshint-stylish": "^2.2.1"
   },
   "peerDependencies": {},
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/BclEx/generator-xrm/issues"
+    "url": "https://github.com/BclEx/generator-xrm-core/issues"
   },
-  "homepage": "http://BclEx.github.io/generator-xrm/",
-  "_id": "generator-xrm@0.1.0",
-  "_from": "generator-xrm@"
+  "homepage": "http://BclEx.github.io/generator-xrm-core/",
+  "_id": "generator-xrm-core@0.1.0",
+  "_from": "generator-xrm-core@"
 }

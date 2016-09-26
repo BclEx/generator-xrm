@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var _ = require('lodash');
@@ -17,6 +18,7 @@ function q(s, ctx) {
 }
 
 function build_(s, theme, ctx) {
+    // jshint validthis:true
     var t0 = s[0];
     t0.push(function (selector, $) {
         var render = '\
@@ -163,12 +165,13 @@ export default React.createClass({\n\
             this.setState({addingActivity: false});\n\
         });\n\
     },\n\
-    render() {" + $.verbatim(q(render, entityName)) + "}\n\
-});", entityName));
+    render() {" + $.verbatim(q(render, ctx)) + "}\n\
+});", ctx));
     }.bind(this));
 }
 
 function build(s, theme, ctx) {
+    // jshint validthis:true
     var t0 = s[0];
     t0.push(function (selector, $) {
         $.body.append(q("\

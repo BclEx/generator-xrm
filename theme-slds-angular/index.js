@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var util = require('util');
@@ -27,7 +28,7 @@ Theme.prototype.buildAllElements = function buildAllElements(s, fields) {
         flag |= this.buildElement(s, prop);
     }.bind(this));
     return flag;
-}
+};
 
 Theme.prototype.buildForm = function buildForm(s, body) {
     var t1 = s[0];
@@ -50,7 +51,7 @@ Theme.prototype.buildForm = function buildForm(s, body) {
   </section>\n\
 </div>\n');
     });
-}
+};
 
 Theme.prototype.buildElement = function buildElement(s, prop) {
     var propName = prop.name;
@@ -126,15 +127,15 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     </div>
         // </div>
         var fieldType = null;
-        if (prop.hasOwnProperty('currency')) fieldType = 'text';
-        else if (prop.hasOwnProperty('date')) fieldType = 'date';
-        else if (prop.hasOwnProperty('dateTime')) fieldType = 'datetime';
-        else if (prop.hasOwnProperty('email')) fieldType = 'email';
-        else if (prop.hasOwnProperty('geolocation')) fieldType = 'text';
-        else if (prop.hasOwnProperty('number')) fieldType = 'text';
-        else if (prop.hasOwnProperty('percent')) fieldType = 'text';
-        else if (prop.hasOwnProperty('phone')) fieldType = 'tel';
-        else if (prop.hasOwnProperty('url')) fieldType = 'url';
+        if (prop.hasOwnProperty('currency')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('date')) { fieldType = 'date'; }
+        else if (prop.hasOwnProperty('dateTime')) { fieldType = 'datetime'; }
+        else if (prop.hasOwnProperty('email')) { fieldType = 'email'; }
+        else if (prop.hasOwnProperty('geolocation')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('number')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('percent')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('phone')) { fieldType = 'tel'; }
+        else if (prop.hasOwnProperty('url')) { fieldType = 'url'; }
         t1.push(function (selector, $) {
             $(selector).append('\
 <div class="slds-form-element">\n\

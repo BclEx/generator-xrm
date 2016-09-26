@@ -69,16 +69,3 @@ Generator.prototype.createFiles = function createFiles() {
   // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
-
-function getOnDelete(database, onDelete) {
-  switch (database) {
-    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
-      if (onDelete == 'clearvalue') {
-        return 'SET NULL';
-      } else if (onDelete == 'cascade') {
-        return 'CASCADE';
-      }
-      return null; // dontallow
-  }
-  return null;
-}

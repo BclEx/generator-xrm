@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var _ = require('lodash');
@@ -17,6 +18,7 @@ function q(s, ctx) {
 }
 
 function build(s, theme, ctx) {
+    // jshint validthis:true
     var t0 = s[0];
     t0.push(function (selector, $) {
         var render = 'return (\n\

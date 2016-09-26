@@ -27,6 +27,19 @@ var Generator = module.exports = function Generator() {
 };
 util.inherits(Generator, scriptBase);
 
+function getOnDelete(database, onDelete) {
+  switch (database) {
+    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
+      if (onDelete === 'clearvalue') {
+        return 'SET NULL';
+      } else if (onDelete === 'cascade') {
+        return 'CASCADE';
+      }
+      return null; // dontallow
+  }
+  return null;
+}
+
 Generator.prototype.createFiles = function createFiles() {
   debug('Defining database');
   var ctx = this.options.ctx;
@@ -82,13 +95,14 @@ Generator.prototype.createFiles = function createFiles() {
     } else if (x.hasOwnProperty('number')) {
       var precision = x.number.precision || 18;
       var scale = x.number.scale || 0;
-      if (scale == 0) {
+      if (scale === 0) {
         t.push({ integer: { name: x.Id } });
       } else {
         t.push({ decimal: { name: x.Id, precision: precision, scale: scale } });
       }
     } else if (x.hasOwnProperty('percent')) {
-      t.push({ decimal: { name: x.Id, precision: 18, scale: scale } });
+      var scale2 = x.number.scale || 0;
+      t.push({ decimal: { name: x.Id, precision: 18, scale: scale2 } });
     } else if (x.hasOwnProperty('phone')) {
       t.push({ string: { name: x.Id } });
     } else if (x.hasOwnProperty('picklist')) {
@@ -145,16 +159,3 @@ Generator.prototype.createFiles = function createFiles() {
   // console.log(sqlCtx);
   this.composeWith('fragment:sql', { options: { ctx: sqlCtx } });
 };
-
-function getOnDelete(database, onDelete) {
-  switch (database) {
-    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
-      if (onDelete == 'clearvalue') {
-        return 'SET NULL';
-      } else if (onDelete == 'cascade') {
-        return 'CASCADE';
-      }
-      return null; // dontallow
-  }
-  return null;
-}

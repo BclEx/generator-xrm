@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var _ = require('lodash');
@@ -20,6 +21,7 @@ function q(s, ctx, a0, a1, a2) {
 }
 
 function build(s, ctx, database) {
+    // jshint validthis:true
     var ctxName = ctx.name;
     var t0 = s;
     var $ = knex({ client: database, formatting: true });
@@ -37,14 +39,14 @@ function build(s, ctx, database) {
             ctx.missingField(key, 'aspnet-repository');
             return;
         }
-        elms1.push(field.Id + ' as ' + field.name)
+        elms1.push(field.Id + ' as ' + field.name);
     });
     var getAllSql = $.select(elms1).from(ctxName).toQuery();
 
     // getByIdSql
     var elms2 = [ctx.Id];
     _.forEach(ctx.getFields(3), function (field) {
-        elms2.push(field.Id + ' as ' + field.name)
+        elms2.push(field.Id + ' as ' + field.name);
     });
     var getByIdSql = $.select(elms2).from(ctxName).whereRaw(ctxName + 'Id = @' + ctxName + 'Id').toQuery();
 

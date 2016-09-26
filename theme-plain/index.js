@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var util = require('util');
@@ -24,12 +25,13 @@ util.inherits(Theme, themeBase);
 Theme.prototype.buildAllElements = function buildElement(s, fields) {
     var t0 = s[1];
     fields.forEach(function (prop) {
+        var propName = prop.name;
         t0.push({ rule: '.' + propName, decls: { float: 'left', 'margin-right': '3%' } });
     });
-    fields.forEach(function(prop) {
+    fields.forEach(function (prop) {
         buildElement(s, prop);
     }.bind(this));
-}
+};
 
 Theme.prototype.buildElement = function buildElement(s, prop) {
     var propName = prop.name;
@@ -46,7 +48,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <input name="firstName" type="text" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <input id="'+ propName + '" type="text" name="data.' + propName + '" ng-model="' + propName + '" readonly />\n\
@@ -60,7 +63,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     </select>
         // </div>
         t0.push({ rule: '.' + propName + 'Id', decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <select id="' + propName + '" name="data.' + propName + '" ng-model="' + propName + '" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose ' + prop.label + '..." chosen>\n\
@@ -74,7 +78,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <input id="firstName" type="checkbox" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <input id="'+ propName + '" type="checkbox" name="data.' + propName + '" ng-model="' + propName + '" />\n\
@@ -86,20 +91,21 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <input id="firstName" type="[text/date/datetime/tel/url]" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         var fieldType = null;
-        if (prop.hasOwnProperty('currency')) fieldType = 'text';
-        else if (prop.hasOwnProperty('date')) fieldType = 'date';
-        else if (prop.hasOwnProperty('dateTime')) fieldType = 'datetime';
-        else if (prop.hasOwnProperty('email')) fieldType = 'email';
-        else if (prop.hasOwnProperty('geolocation')) fieldType = 'text';
-        else if (prop.hasOwnProperty('number')) fieldType = 'text';
-        else if (prop.hasOwnProperty('percent')) fieldType = 'text';
-        else if (prop.hasOwnProperty('phone')) fieldType = 'tel';
-        else if (prop.hasOwnProperty('url')) fieldType = 'url';
+        if (prop.hasOwnProperty('currency')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('date')) { fieldType = 'date'; }
+        else if (prop.hasOwnProperty('dateTime')) { fieldType = 'datetime'; }
+        else if (prop.hasOwnProperty('email')) { fieldType = 'email'; }
+        else if (prop.hasOwnProperty('geolocation')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('number')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('percent')) { fieldType = 'text'; }
+        else if (prop.hasOwnProperty('phone')) { fieldType = 'tel'; }
+        else if (prop.hasOwnProperty('url')) { fieldType = 'url'; }
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
-    <input id="'+ propName + '" type="'+ fieldType +'" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+    <input id="'+ propName + '" type="' + fieldType + '" name="data.' + propName + '" ng-model="' + propName + '" />\n\
 </div>\n');
         });
     } else if (_.some(['picklist', 'picklistMulti'], hasOwnProperty, prop)) {
@@ -110,7 +116,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //    </select>
         //</div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
             <div class="field ' + propName + '">\n\
                 <label for="'+ propName + '">' + prop.label + '</label>\n\
                 <select id="' + propName + '" name="data.' + propName + '" ng-model="' + propName + '" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose ' + prop.label + '..." chosen>\n\
@@ -124,7 +131,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <input id="firstName" type="text" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <input id="'+ propName + '" type="text" name="data.' + propName + '" ng-model="' + propName + '" />\n\
@@ -136,7 +144,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <textarea name="firstName" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <textarea id="'+ propName + '" name="data.' + propName + '" ng-model="' + propName + '" />\n\
@@ -148,7 +157,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         //     <input id="firstName" type="text" name="data.firstName" ng-model="firstName" readonly />
         // </div>
         t0.push({ rule: '.' + propName, decls: { width: '20%' } });
-        t1.push(function ($) { $('\
+        t1.push(function ($) {
+            $('\
 <div class="field ' + propName + '">\n\
     <label for="'+ propName + '">' + prop.label + '</label>\n\
     <input id="'+ propName + '" type="text" name="data.' + propName + '" ng-model="' + propName + '" />\n\
@@ -162,7 +172,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
 
 Theme.prototype.buildHeader = function buildHeader(s) {
     var t1 = s[0];
-    t1.push(function ($) { $('\
+    t1.push(function ($) {
+        $('\
 <div class="slds">\n\
     <div class="slds" style="margin-top:10px;margin-left:10px;">\n');
     });
@@ -170,7 +181,8 @@ Theme.prototype.buildHeader = function buildHeader(s) {
 
 Theme.prototype.buildFooter = function buildFooter(s) {
     var t1 = s[0];
-    t1.push(function ($) { $('\
+    t1.push(function ($) {
+        $('\
     </div>\n\
 </div>\n');
     });

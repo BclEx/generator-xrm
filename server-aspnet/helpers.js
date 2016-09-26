@@ -1,7 +1,4 @@
 'use strict';
-
-exports.toQuery = toQuery;
-
 var _ = require('lodash');
 
 function toQuery(node) {
@@ -9,3 +6,4 @@ function toQuery(node) {
   return sql;
 }
 
+exports.toQuery = toQuery;

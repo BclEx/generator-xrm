@@ -1,4 +1,5 @@
 'use strict';
+// jshint multistr: true
 
 var fs = require('fs');
 var path = require('path');
@@ -40,8 +41,8 @@ describe('load test.', function () {
     });
     it('can be loaded by name.', function (done) {
       xrm.run(function () {
-        assert(this.options.ctx.key == 'value0');
-        assert(this.options.ctx.func() == 'value1');
+        assert(this.options.ctx.key === 'value0');
+        assert(this.options.ctx.func() === 'value1');
         done();
       }.bind(xrm));
     });
@@ -64,8 +65,8 @@ describe('load test.', function () {
     });
     it('can be loaded by object.', function (done) {
       xrm.run(function () {
-        assert(this.options.ctx.key == 'value0');
-        assert(this.options.ctx.func() == 'value1');
+        assert(this.options.ctx.key === 'value0');
+        assert(this.options.ctx.func() === 'value1');
         done();
       }.bind(xrm));
     });

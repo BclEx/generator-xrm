@@ -7,12 +7,14 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var chalk = require('chalk');
 var _ = require('lodash');
 
 function build(ctx, usings) {
+    // jshint validthis:true
     var ctxName = ctx.name;
 
     // build poco
@@ -64,7 +66,7 @@ function build(ctx, usings) {
             // notimplemented
         } else if (x.hasOwnProperty('number')) {
             var scale = x.number.scale || 0;
-            if (scale == 0) {
+            if (scale === 0) {
                 t.push({ int: { name: x.Id }, attribute: [{ DisplayName: label }] });
             } else {
                 t.push({ decimal: { name: x.Id }, attribute: [{ DisplayName: label }] });
@@ -96,12 +98,12 @@ function build(ctx, usings) {
             t.push({ string: { name: x.Id }, attribute: [{ DisplayName: label }] });
         } else {
             this.log(chalk.bold('ERR! ' + chalk.green(ctxName + '.' + x.name + ': { field.x: }') + ' not matched'));
-             return null;
+            return null;
         }
     }.bind(this));
-    if (usingSystem) usings.push('System');
-    if (usingComponentModel) usings.push('System.ComponentModel');
-    if (usingDataAnnotations) usings.push('System.ComponentModel.DataAnnotations');
+    if (usingSystem) { usings.push('System'); }
+    if (usingComponentModel) { usings.push('System.ComponentModel'); }
+    if (usingDataAnnotations) { usings.push('System.ComponentModel.DataAnnotations'); }
     return t;
 }
 

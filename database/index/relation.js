@@ -12,7 +12,21 @@
 var chalk = require('chalk');
 var _ = require('lodash');
 
+function getOnDelete(database, onDelete) {
+  switch (database) {
+    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
+      if (onDelete === 'clearvalue') {
+        return 'SET NULL';
+      } else if (onDelete === 'cascade') {
+        return 'CASCADE';
+      }
+      return null; // dontallow
+  }
+  return null;
+}
+
 function build(database, ctx, x) {
+  // jshint validthis:true
   var ctxName = ctx.name;
 
   // build content
@@ -24,19 +38,6 @@ function build(database, ctx, x) {
   t.push({ uuid: { name: name + 'Id' }, on: relatedTo[0] + relatedTo[1], references: relatedTo[1] + 'Id', onDelete: onDelete });
   t.push({ primary: [ctxName + 'Id', name + 'Id'] });
   return t;
-};
-
-function getOnDelete(database, onDelete) {
-  switch (database) {
-    case 'mssql': //: NO ACTION | CASCADE | SET NULL | SET DEFAULT
-      if (onDelete == 'clearvalue') {
-        return 'SET NULL';
-      } else if (onDelete == 'cascade') {
-        return 'CASCADE';
-      }
-      return null; // dontallow
-  }
-  return null;
 }
 
 module.exports = {

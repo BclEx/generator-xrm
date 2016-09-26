@@ -7,6 +7,7 @@
  */
 
 'use strict';
+// jshint multistr: true
 
 // External libs.
 var _ = require('lodash');
@@ -20,6 +21,7 @@ function q(s, ctx, a0, a1, a2) {
 }
 
 function build(s, ctx, database) {
+    // jshint validthis:true
     var ctxName = ctx.name;
     var t0 = s;
     var $ = knex({ client: database, formatting: true });

@@ -66,7 +66,6 @@ Generator.prototype.createFiles = function createFiles() {
     repository: { append: s2 }
   });
   var s3 = [];
-  var database = this.options.database || 'mssql';
   ServiceRepository.build.call(this, s3, ctx, database);
   children.push({
     _name: ctxName,

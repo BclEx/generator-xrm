@@ -8,20 +8,28 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    
+
     jshint: {
       files: [
         'Gruntfile.js',
+        //'jsx.js',
         'script-base.js',
-        'css/*.js',
-        'html/*.js',
-        'js/*.js',
-        'knex/*.js',
+        'theme-base.js',
+        'util.js',
+        'xrm-parse.js',
+        'app/**/*.js',
+        //'client-angular/**/*.js',
+        'client-react/**/*.js',
+        'database/**/*.js',
+        'server-aspnet/**/*.js',
+        'theme-plain/**/*.js',
+        'theme-slds-angular/**/*.js',
+        'theme-slds-react/**/*.js',
         'test/**/*.js',
       ],
       options: {
@@ -33,6 +41,14 @@ module.exports = function(grunt) {
     watch: {
       files: ['<%= jshint.files %>'],
       tasks: ['jshint']
+    },
+
+    simplemocha: {
+      options: {
+        ui: 'bdd',
+        reporter: 'spec'
+      },
+      all: 'test/**/*.js'
     }
 
   });
@@ -40,7 +56,8 @@ module.exports = function(grunt) {
   // Actually load this plugin's task(s).
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-simple-mocha');
 
   // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['jshint', 'simplemocha']);
 };

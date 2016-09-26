@@ -13,6 +13,7 @@ var chalk = require('chalk');
 var _ = require('lodash');
 
 function build(database, ctx, schemaName) {
+  // jshint validthis:true
   var ctxName = ctx.name;
   return function ($) {
     // build content
@@ -31,13 +32,13 @@ function build(database, ctx, schemaName) {
         var alias = '_' + x.Id;
         t.push(alias + '.' + displayName + ' as ' + x.Id + 'Name');
         v = v.leftJoin(relatedTo[0] + relatedTo[1] + ' as ' + alias, function () {
-          this.on(ctxName + '.' + x.Id, '=', alias + '.' + relatedTo[1] + 'Id')
+          this.on(ctxName + '.' + x.Id, '=', alias + '.' + relatedTo[1] + 'Id');
         });
       }
     }.bind(this));
     return v.select(t);
-  }
-};
+  };
+}
 
 // var viewDefinition = $.from('users').leftJoin('accounts', function () {
 //   this.on('accounts.id', '=', 'users.account_id').orOn('accounts.owner_id', '=', 'users.id')

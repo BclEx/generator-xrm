@@ -16,8 +16,9 @@ function jsx(input) {
     if (input && input.forEach) {
         input.forEach(function (value, i) {
             var last;
-            if (i + 1 === input.length)
+            if (i + 1 === input.length) {
                 last = end;
+            }
             add(value, last);
         });
     } else {
@@ -39,7 +40,7 @@ function element(/*input, …*/) {
         var indent = this._elem.indent;
         format(this.append, resolve(
             input, indent, this._elem.icount + (indent ? 1 : 0)),
-            function () { that.append(true) });
+            function () { that.append(true); });
     };
     self.close = function (input) {
         if (input !== undefined) {
@@ -53,7 +54,7 @@ function element(/*input, …*/) {
 }
 
 function create_indent(character, count) {
-    return (new Array(count || 0).join(character || ''))
+    return (new Array(count || 0).join(character || ''));
 }
 
 function resolve(data, indent, indent_count) {
@@ -90,7 +91,7 @@ function resolve(data, indent, indent_count) {
     var isStringContent;
     switch (typeof values) {
         case 'object':
-            if (values === null) break;
+            if (values === null) { break; }
             if (values._attr) {
                 get_attributes(values._attr);
             }
@@ -103,9 +104,9 @@ function resolve(data, indent, indent_count) {
                 isStringContent = false;
                 content.push('');
                 values.forEach(function (value) {
-                    if (typeof value == 'object') {
+                    if (typeof value === 'object') {
                         var _name = Object.keys(value)[0];
-                        if (_name == '_attr') {
+                        if (_name === '_attr') {
                             get_attributes(value._attr);
                         } else {
                             content.push(resolve(
@@ -140,20 +141,20 @@ function resolve(data, indent, indent_count) {
 }
 
 function format(append, elem, end) {
-    if (typeof elem != 'object') {
+    if (typeof elem !== 'object') {
         return append(false, elem);
     }
     var len = elem.interrupt ? 1 : elem.content.length;
     function proceed() {
         while (elem.content.length) {
             var value = elem.content.shift();
-            if (value === undefined) continue;
-            if (interrupt(value)) return;
+            if (value === undefined) { continue; }
+            if (interrupt(value)) { return; }
             format(append, value);
         }
-        append(false, (len > 1 ? elem.indents : '')
-            + (elem.name ? '</' + elem.name + '>' : '')
-            + (elem.indent && !end ? '\n' : ''));
+        append(false, (len > 1 ? elem.indents : '') +
+            (elem.name ? '</' + elem.name + '>' : '') +
+            (elem.indent && !end ? '\n' : ''));
         if (end) {
             end();
         }
@@ -168,11 +169,11 @@ function format(append, elem, end) {
         }
         return false;
     }
-    append(false, elem.indents
-        + (elem.name ? '<' + elem.name : '')
-        + (elem.attributes.length ? ' ' + elem.attributes.join(' ') : '')
-        + (len ? (elem.name ? '>' : '') : (elem.name ? '/>' : ''))
-        + (elem.indent && len > 1 ? '\n' : ''));
+    append(false, elem.indents +
+        (elem.name ? '<' + elem.name : '') +
+        (elem.attributes.length ? ' ' + elem.attributes.join(' ') : '') +
+        (len ? (elem.name ? '>' : '') : (elem.name ? '/>' : '')) +
+        (elem.indent && len > 1 ? '\n' : ''));
     if (!len) {
         return append(false, elem.indent ? '\n' : '');
     }
@@ -199,9 +200,9 @@ var XML_CHARACTER_MAP = {
     '>': '&gt;'
 };
 function escapeForXML(string) {
-    return string && string.replace
-        ? string.replace(/([&"<>'])/g, function (str, item) {
+    return string && (string.replace ?
+        string.replace(/([&"<>'])/g, function (str, item) {
             return XML_CHARACTER_MAP[item];
         })
-        : string;
+        : string);
 }
