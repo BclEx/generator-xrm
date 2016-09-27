@@ -64,6 +64,46 @@ function bindField(field, flag) {
 // bind-layout
 var LayoutMethods = {
 };
+function packLayout(layout) {
+  // jshint validthis:true
+  var b = [];
+  var self = this;
+  _.forOwn(layout, function (value, key) {
+    if (key === 'name' || key === 'related') { return; }
+    if (!_.isArray(value.l)) {
+      self.log(chalk.bold('ERR! ' + chalk.green(self.name + ': { layout: }') + ' obj.l not array'));
+      return;
+    }
+    if (!_.isArray(value.l[0])) {
+      self.log(chalk.bold('ERR! ' + chalk.green(self.name + ': { layout: }') + ' obj.l[0] not array'));
+      return;
+    }
+    var p = new Array(value.l[0].length);
+    value.l.forEach(function (l) {
+      for (var i = 0; i < l.length; ++i) {
+        if (!p[i]) { p[i] = []; }
+        var opt = {};
+        var ids = l[i].split('!');
+        var fieldId = ids[0];
+        if (ids.length > 1) {
+          if (fieldId === 'ro') { opt.readonly = true; }
+          fieldId = ids[1];
+        }
+        if (!fieldId || fieldId.length === 0) {
+          return;
+        }
+        var field = self.fields[fieldId];
+        if (!field) {
+          self.missingField(fieldId, 'layout.' + layout.name);
+          return;
+        }
+        p[i].push({ f: field, o: opt });
+      }
+    });
+    b.push({ title: value.title, p: p });
+  });
+  return { b: b, related: layout.related };
+}
 function bindLayout(layout) {
   // jshint validthis:true
   debug('layout: ' + layout.name);
@@ -71,6 +111,7 @@ function bindLayout(layout) {
     this.log(chalk.bold('ERR! ' + chalk.green(this.name + ': { layout.name: }') + ' not defined'));
     return null;
   }
+  layout.pack = packLayout.call(this, layout);
   _.extend(layout, LayoutMethods);
   layout.id = _.camelCase(layout.Id = layout.name);
   return layout;

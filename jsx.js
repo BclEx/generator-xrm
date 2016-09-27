@@ -1,6 +1,17 @@
 
 'use strict';
 
+var XML_CHARACTER_MAP = {
+    '&': '&amp;',
+    '"': '&quot;',
+    "'": '&apos;',
+    '<': '&lt;',
+    '>': '&gt;'
+};
+function escapeForXML(string) {
+    return string && (string.replace ? string.replace(/([&"<>'])/g, function (str, item) { return XML_CHARACTER_MAP[item]; }) : string);
+}
+
 function jsx(input) {
     var output = '', indent = '    ';
     function append(interrupt, out) {
@@ -79,8 +90,7 @@ function resolve(data, indent, indent_count) {
         }
     }
 
-    var attributes = [],
-        content = [];
+    var attributes = [], content = [];
     function get_attributes(obj) {
         var keys = Object.keys(obj);
         keys.forEach(function (key) {
@@ -92,26 +102,16 @@ function resolve(data, indent, indent_count) {
     switch (typeof values) {
         case 'object':
             if (values === null) { break; }
-            if (values._attr) {
-                get_attributes(values._attr);
-            }
-            if (values._cdata) {
-                content.push(
-                    ('<![CDATA[' + values._cdata).replace(/\]\]>/g, ']]]]><![CDATA[>') + ']]>'
-                );
-            }
+            if (values._attr) { get_attributes(values._attr); }
+            if (values._cdata) { content.push(('<![CDATA[' + values._cdata).replace(/\]\]>/g, ']]]]><![CDATA[>') + ']]>'); }
             if (values.forEach) {
                 isStringContent = false;
                 content.push('');
                 values.forEach(function (value) {
                     if (typeof value === 'object') {
                         var _name = Object.keys(value)[0];
-                        if (_name === '_attr') {
-                            get_attributes(value._attr);
-                        } else {
-                            content.push(resolve(
-                                value, indent, indent_count + 1));
-                        }
+                        if (_name === '_attr') { get_attributes(value._attr); }
+                        else { content.push(resolve(value, indent, indent_count + 1)); }
                     } else {
                         //string
                         content.pop();
@@ -119,9 +119,7 @@ function resolve(data, indent, indent_count) {
                         content.push(escapeForXML(value));
                     }
                 });
-                if (!isStringContent) {
-                    content.push('');
-                }
+                if (!isStringContent) { content.push(''); }
             }
             break;
         default:
@@ -191,18 +189,3 @@ function attribute(key, value) {
 
 module.exports = jsx;
 module.exports.element = module.exports.Element = element;
-
-var XML_CHARACTER_MAP = {
-    '&': '&amp;',
-    '"': '&quot;',
-    "'": '&apos;',
-    '<': '&lt;',
-    '>': '&gt;'
-};
-function escapeForXML(string) {
-    return string && (string.replace ?
-        string.replace(/([&"<>'])/g, function (str, item) {
-            return XML_CHARACTER_MAP[item];
-        })
-        : string);
-}

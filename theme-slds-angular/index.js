@@ -61,7 +61,8 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
 
     // build content
     var t1 = s[0];
-    if (_.some(['autoNumber', 'formula', 'rollupSummary', 'externalLookup'], hasOwnProperty, prop)) {
+    var _hasOwnProperty = function (name) { return prop.hasOwnProperty(name); };
+    if (_.some(['autoNumber', 'formula', 'rollupSummary', 'externalLookup'], _hasOwnProperty)) {
         // <div class="slds-form-element">
         //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
         //     <div class="slds-form-element__control">
@@ -77,7 +78,7 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
     </div>\n\
 </div>\n');
         });
-    } else if (_.some(['lookup', 'masterDetail'], hasOwnProperty, prop)) {
+    } else if (_.some(['lookup', 'masterDetail'], _hasOwnProperty)) {
         // <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
         //     <div class="slds-form-element">
         //         <label class="slds-form-element__label" for="accountId">Account</label>
@@ -119,7 +120,7 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
     </div>\n\
 </div>\n');
         });
-    } else if (_.some(['currency', 'date', 'dateTime', 'email', 'geolocation', 'number', 'email', 'percent', 'phone', 'url'], hasOwnProperty, prop)) {
+    } else if (_.some(['currency', 'date', 'dateTime', 'email', 'geolocation', 'number', 'email', 'percent', 'phone', 'url'], _hasOwnProperty)) {
         // <div class="slds-form-element">
         //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
         //     <div class="slds-form-element__control">
@@ -145,7 +146,7 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
     </div>\n\
 </div>\n');
         });
-    } else if (_.some(['picklist', 'picklistMulti'], hasOwnProperty, prop)) {
+    } else if (_.some(['picklist', 'picklistMulti'], _hasOwnProperty)) {
         // <div class="slds-form-element">
         //     <label class="slds-form-element__label" for="status">Status</label>
         //     <div class="slds-form-element__control">
@@ -185,7 +186,7 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
     </div>\n\
 </div>\n');
         });
-    } else if (_.some(['textArea', 'textAreaLong', 'textAreaRich'], hasOwnProperty, prop)) {
+    } else if (_.some(['textArea', 'textAreaLong', 'textAreaRich'], _hasOwnProperty)) {
         // <div class="slds-form-element">
         //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
         //     <div class="slds-form-element__control">

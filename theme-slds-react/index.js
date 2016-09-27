@@ -22,105 +22,125 @@ var Theme = module.exports = function Theme() {
 };
 util.inherits(Theme, themeBase);
 
-Theme.prototype.buildAllElements = function buildAllElements(s, fields) {
-    var flag = false;
-    fields.forEach(function (prop) {
-        flag |= this.buildElement(s, prop);
-    }.bind(this));
-    return flag;
+var XML_CHARACTER_MAP = {
+    '&': '&amp;',
+    '"': '&quot;',
+    "'": '&apos;',
+    '<': '&lt;',
+    '>': '&gt;'
+};
+Theme.prototype.escapeForXML = function escapeForXML(string) {
+    return string && (string.replace ? string.replace(/([&"<>'])/g, function (str, item) { return XML_CHARACTER_MAP[item]; }) : string);
 };
 
-Theme.prototype.buildForm = function buildForm(s, body) {
-    var t1 = s[0];
-    // <div ng-app="sampleModule">
-    // <section class="form-entry sample-entry">
-    //    <form name="sampleEntry" ng-controller="sampleEntryController as form" ng-submit="form.submit(jobEntry.$valid, data)">
-    //    </form>
-    // </section>
-    // </div>
-    t1.push(function (selector, $) {
-        $(selector).append('\
-<div ng-app="'+ this.entityName + 'Module">\n\
-  <section class="form-entry ' + this.entityName + '-entry">\n\
-    <form name="' + this.entityName + 'Entry" ng-controller="' + this.entityName + 'EntryController as form" ng-submit="form.submit(' + this.entityName + 'Entry.$valid, data)">\n');
-    }.bind(this));
-    body(s);
-    t1.push(function (selector, $) {
-        $(selector).append('\
-    </form>\n\
-  </section>\n\
+Theme.prototype.buildLayout = function buildLayout(s, pack) {
+    // build content
+    var s0 = s[0];
+    var self = this;
+    _.forEach(pack.b, function (b) {
+        //         s0.push('\
+        // <div className="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2">\n');
+        _.forEach(b.p, function (p) {
+            s0.push('\
+<div className="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2">\n');
+            _.forEach(p, function (v) {
+                self.buildElement(s, v.f, v.o);
+            });
+            s0.push('\
 </div>\n');
+        });
+        //         s0.push('\
+        // </div>\n');
     });
 };
 
-Theme.prototype.buildElement = function buildElement(s, prop) {
+Theme.prototype.buildElement = function buildElement(s, prop, opt) {
     var propName = prop.name;
+    if (!propName) {
+        this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + ': { field.name: }') + ' not defined')); return false;
+    }
+    var a = 0, b = 2;
 
     // build content
-    var t1 = s[0];
-    if (_.some(['autoNumber', 'formula', 'rollupSummary', 'externalLookup'], hasOwnProperty, prop)) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
-        //     <div class="slds-form-element__control">
-        //         <input id="firstName" class="slds-input" type="text" placeholder="Placeholder Text" name="data.firstName" ng-model="firstName" readonly />
+    var s0 = s[0];
+    var _hasOwnProperty = function (name) { return prop.hasOwnProperty(name); };
+    if (_.some(['autoNumber', 'formula', 'rollupSummary', 'externalLookup'], _hasOwnProperty)) {
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="firstName">Opportunity</label>
+        //     <div className="slds-form-element__control">
+        //         <input className="slds-input" type="text" placeholder="Placeholder Text" valueLink={this.linkState("firstName")} readonly />
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <input id="' + propName + '" class="slds-input" type="text" placeholder="Placeholder Text" name="data.' + propName + '" ng-model="' + propName + '" readonly />\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <input class="slds-input" type="text" placeholder="Placeholder Text" valueLink={this.linkState("' + propName + '")} readonly />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <input className="slds-input" type="text" placeholder="Placeholder Text" valueLink={this.linkState("' + propName + '")} readonly />\n\
     </div>\n\
 </div>\n');
-        });
-    } else if (_.some(['lookup', 'masterDetail'], hasOwnProperty, prop)) {
-        // <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
-        //     <div class="slds-form-element">
-        //         <label class="slds-form-element__label" for="accountId">Account</label>
-        //         <select name="accountId" ng-model="data.accountId" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose Status..." chosen>
-        //             <option label=""></option>
-        //         </select>
+        }
+    } else if (_.some(['lookup', 'masterDetail'], _hasOwnProperty)) {
+        // <div className="slds-lookup">
+        //     <div className="slds-form-element">
+        //         <label className="slds-form-element__label" htmlFor="accountId">Account</label>
+        //         <select valueLink={this.linkState("firstName")} />
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <select />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div class="slds-lookup">\n\
     <div class="slds-form-element">\n\
-        <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-        <select name="' + propName + '" name="data.' + propName + '" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose ' + prop.label + '..." chosen>\n\
-            <option label=""></option>\n\
-        </select>\n\
+        <label class="slds-form-element__label" htmlFor="' + propName + '">' + prop.label + '</label>\n\
+        <select />\n\
     </div>\n\
 </div>\n');
-        });
+        }
     } else if (prop.hasOwnProperty('checkbox')) {
-        // <div class="slds-form-element">
-        //     <div class="slds-form-element__control">
-        //         <label class="slds-checkbox">
-        //             <input id="firstName" type="checkbox" name="options" name="data.firstName" ng-model="firstName" />
+        // <div className="slds-form-element">
+        //     <div className="slds-form-element__control">
+        //         <label className="slds-checkbox">
+        //             <input id="firstName" type="checkbox" valueLink={this.linkState("firstName")} />
         //             <span class="slds-checkbox--faux"></span>
         //             <span class="slds-form-element__label">First Name</span>
         //         </label>
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <input type="checkbox" valueLink={this.linkState("' + propName + '")} />\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+</label>\n');
+        } else {
+            s0.push('\
 <div class="slds-form-element">\n\
     <div class="slds-form-element__control">\n\
         <label class="slds-checkbox">\n\
-            <input id="' + propName + '" type="checkbox" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+            <input type="checkbox" valueLink={this.linkState("' + propName + '")} />\n\
             <span class="slds-checkbox--faux"></span>\n\
-            <span class="slds-form-element__label">' + prop.label + '</span>\n\
+            <span class="slds-form-element__label">' + this.escapeForXML(prop.label) + '</span>\n\
         </label>\n\
     </div>\n\
 </div>\n');
-        });
-    } else if (_.some(['currency', 'date', 'dateTime', 'email', 'geolocation', 'number', 'email', 'percent', 'phone', 'url'], hasOwnProperty, prop)) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
-        //     <div class="slds-form-element__control">
-        //         <input id="firstName" class="slds-input" type="[text/date/datetime/tel/url]" name="data.firstName" ng-model="firstName" />
+        }
+    } else if (_.some(['currency', 'date', 'dateTime', 'email', 'geolocation', 'number', 'email', 'percent', 'phone', 'url'], _hasOwnProperty)) {
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="firstName">Opportunity</label>
+        //     <div className="slds-form-element__control">
+        //         <input className="slds-input" type="[text/date/datetime/tel/url]" valueLink={this.linkState("firstName")} />
         //     </div>
         // </div>
         var fieldType = null;
@@ -133,87 +153,113 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
         else if (prop.hasOwnProperty('percent')) { fieldType = 'text'; }
         else if (prop.hasOwnProperty('phone')) { fieldType = 'tel'; }
         else if (prop.hasOwnProperty('url')) { fieldType = 'url'; }
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <input id="'+ propName + '" class="slds-input" type="' + fieldType + '" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <input className="slds-input" type="' + fieldType + '" valueLink={this.linkState("' + propName + '")} />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <input className="slds-input" type="' + fieldType + '" valueLink={this.linkState("' + propName + '")} />\n\
     </div>\n\
 </div>\n');
-        });
-    } else if (_.some(['picklist', 'picklistMulti'], hasOwnProperty, prop)) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="status">Status</label>
-        //     <div class="slds-form-element__control">
-        //         <div class="slds-select_container">
-        //             <select id="status" name="data.status" ng-model="status" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose Status..." chosen>
-        //                 <option label=""></option>
-        //             </select>
+        }
+    } else if (_.some(['picklist', 'picklistMulti'], _hasOwnProperty)) {
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="status">Status</label>
+        //     <div className="slds-form-element__control">
+        //         <div className="slds-select_container">
+        //             <select placeholder="Choose Status..." valueLink={this.linkState("firstName")} />
         //         </div>
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <div class="slds-select_container">\n\
-            <select id="' + propName + '" name="data.' + propName + '" ng-model="' + propName + '" ng-required ng-options="jobStatus.name for jobStatus in jobStatuses" placeholder="Choose ' + prop.label + '..." chosen>\n\
-                <option label=""></option>\n\
-            </select>\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <select placeholder="Choose ' + this.escapeForXML(prop.label) + '..." valueLink={this.linkState("' + propName + '")} />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <div className="slds-select_container">\n\
+            <select placeholder="Choose ' + this.escapeForXML(prop.label) + '..." valueLink={this.linkState("' + propName + '")} />\n\
         </div>\n\
     </div>\n\
 </div>\n');
-        });
+        }
     } else if (prop.hasOwnProperty('text')) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
-        //     <div class="slds-form-element__control">
-        //         <input id="firstName" type="text" name="data.firstName" ng-model="firstName" />
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="firstName">Opportunity</label>
+        //     <div className="slds-form-element__control">
+        //         <input type="text" valueLink={this.linkState("firstName")} />
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <input id="'+ propName + '" class="slds-input" type="text" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <input className="slds-input" type="text" valueLink={this.linkState("' + propName + '")} />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <input className="slds-input" type="text" valueLink={this.linkState("' + propName + '")} />\n\
     </div>\n\
 </div>\n');
-        });
-    } else if (_.some(['textArea', 'textAreaLong', 'textAreaRich'], hasOwnProperty, prop)) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
-        //     <div class="slds-form-element__control">
-        //         <textarea id="firstName" class="slds-textarea" name="data.firstName" ng-model="firstName" />
+        }
+    } else if (_.some(['textArea', 'textAreaLong', 'textAreaRich'], _hasOwnProperty)) {
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="firstName">Opportunity</label>
+        //     <div className="slds-form-element__control">
+        //         <textarea className="slds-textarea" valueLink={this.linkState("firstName")} />
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <textarea id="'+ propName + '" class="slds-textarea" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <textarea className="slds-textarea" valueLink={this.linkState("' + propName + '")} />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <textarea className="slds-textarea" valueLink={this.linkState("' + propName + '")} />\n\
     </div>\n\
 </div>\n');
-        });
+        }
     } else if (prop.hasOwnProperty('textEncrypted')) {
-        // <div class="slds-form-element">
-        //     <label class="slds-form-element__label" for="firstName">Opportunity</label>
-        //     <div class="slds-form-element__control">
-        //         <input id="firstName" class="slds-input" type="text" name="data.firstName" ng-model="firstName" />
+        // <div className="slds-form-element">
+        //     <label className="slds-form-element__label" htmlFor="firstName">Opportunity</label>
+        //     <div className="slds-form-element__control">
+        //         <input className="slds-input" type="text" valueLink={this.linkState("firstName")} />
         //     </div>
         // </div>
-        t1.push(function (selector, $) {
-            $(selector).append('\
-<div class="slds-form-element">\n\
-    <label class="slds-form-element__label" for="'+ propName + '">' + prop.label + '</label>\n\
-    <div class="slds-form-element__control">\n\
-        <input id="'+ propName + '" class="slds-input" type="text" name="data.' + propName + '" ng-model="' + propName + '" />\n\
+        if (a) {
+            s0.push('\
+<label className="slds-form-element__control slds-size--' + a + '-of-' + b + '">\n\
+    <small className="slds-form-element__control">' + this.escapeForXML(prop.label) + '</label>\n\
+    <input className="slds-input" type="text" valueLink={this.linkState("' + propName + '")} />\n\
+</label>\n');
+        } else {
+            s0.push('\
+<div className="slds-form-element">\n\
+    <label className="slds-form-element__label" htmlFor="' + propName + '">' + this.escapeForXML(prop.label) + '</label>\n\
+    <div className="slds-form-element__control">\n\
+        <input className="slds-input" type="text" valueLink={this.linkState("' + propName + '")} />\n\
     </div>\n\
 </div>\n');
-        });
+        }
     } else {
         this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + '.' + propName + ': { field.prop: }') + ' not matched')); return false;
     }
@@ -221,14 +267,14 @@ Theme.prototype.buildElement = function buildElement(s, prop) {
 };
 
 Theme.prototype.buildHeader = function buildHeader(s, body) {
-    var t1 = s[0];
-    t1.push(function (selector, $) {
+    var s0 = s[0];
+    s0.push(function (selector, $) {
         $(selector).append('\
 <div class="slds">\n\
     <div class="slds" style="margin-top:10px;margin-left:10px;">\n');
     });
     body(s);
-    t1.push(function (selector, $) {
+    s0.push(function (selector, $) {
         $(selector).append('\
     </div>\n\
 </div>\n');
@@ -236,8 +282,8 @@ Theme.prototype.buildHeader = function buildHeader(s, body) {
 };
 
 Theme.prototype.buildDetailHeader = function buildDetailHeader(s) {
-    var t1 = s[0];
-    t1.push(function (selector, $) {
+    var s0 = s[0];
+    s0.push(function (selector, $) {
         $(selector).append('\
     <div class="slds-page-header" role="banner">\n\
     <div class="slds-grid">\n\
@@ -348,8 +394,8 @@ Theme.prototype.buildDetailHeader = function buildDetailHeader(s) {
 };
 
 Theme.prototype.buildListHeader = function buildListHeader(s) {
-    var t1 = s[0];
-    t1.push(function (selector, $) {
+    var s0 = s[0];
+    s0.push(function (selector, $) {
         $(selector).append('\
 <div class="slds-page-header" role="banner">\n\
     <div class="slds-grid">\n\
