@@ -14,7 +14,9 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's');
 }
 
 function build(s, theme, ctx) {
@@ -27,8 +29,8 @@ let url = 'api/${Name}';\n\
 export let findAll = sort => h.get(url, {sort});\n\
 export let findByName = name => h.get(url, {name});\n\
 export let findById = id => h.get(url + '/' + id);\n\
-export let updateItem = property => h.put(url, property);\n\
-export let createItem = property => h.post(url, property);\n\
+export let updateItem = entity => h.put(url, entity);\n\
+export let createItem = entity => h.post(url, entity);\n\
 export let deleteItem = id => h.del(url + '/' + id);\n\
 ", ctx));
     }.bind(this));

@@ -14,7 +14,9 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/'/g, '"');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/'/g, '"');
 }
 
 function build(s, ctx) {

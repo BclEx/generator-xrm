@@ -10,7 +10,7 @@
 
 // External libs.
 var util = require('util');
-var scriptBase = require('../script-base.js');
+var scriptBase = require('../script-base');
 var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var Location = require('../util').Location;

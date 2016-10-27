@@ -14,7 +14,10 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's')
+        .replace(/\$\{id\}/g, ctx.id);
 }
 
 function build(s, theme, ctx) {
@@ -25,7 +28,7 @@ function build(s, theme, ctx) {
 <Lookup label="Select a contact"\n\
     searchKey={this.state.searchKey}\n\
     items={this.state.items}\n\
-    dataField="contact_id"\n\
+    dataField="${id}"\n\
     labelField="name"\n\
     onSearchKeyChange={this.searchKeyChangeHandler}\n\
     onChange={this.props.onChange} />)';

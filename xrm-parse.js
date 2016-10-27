@@ -51,13 +51,22 @@ function bindField(field, flag) {
   if (field.hasOwnProperty('lookup')) {
     field.id = _.camelCase(field.Id = field.name + 'Id');
     field.lookup.relatedTo = getObjectNameParts(this.schemaName, field.lookup.relatedTo);
+    field.relate = true;
   } else if (field.hasOwnProperty('masterDetail')) {
     field.id = _.camelCase(field.Id = field.name + 'Id');
     field.masterDetail.relatedTo = getObjectNameParts(this.schemaName, field.masterDetail.relatedTo);
+    field.relate = true;
   } else {
     field.id = _.camelCase(field.Id = field.name);
   }
   field.flag = flag;
+
+  // layout-formating
+  field.defaultLayout = {};
+  if (field.hasOwnProperty('currency')) {
+    field.defaultLayout.textAlign = 'right';
+    field.defaultLayout.format = 'currency';
+  }
   return field;
 }
 

@@ -11,7 +11,7 @@
 
 // External libs.
 var util = require('util');
-var themeBase = require('../theme-base.js');
+var themeBase = require('../theme-base');
 var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var _ = require('lodash');
@@ -33,7 +33,7 @@ Theme.prototype.escapeForXML = function escapeForXML(string) {
     return string && (string.replace ? string.replace(/([&"<>'])/g, function (str, item) { return XML_CHARACTER_MAP[item]; }) : string);
 };
 
-Theme.prototype.buildLayout = function buildLayout(s, pack) {
+Theme.prototype.buildLayout = function buildLayout(s, view, pack) {
     // build content
     var s0 = s[0];
     var self = this;
@@ -41,10 +41,18 @@ Theme.prototype.buildLayout = function buildLayout(s, pack) {
         //         s0.push('\
         // <div className="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2">\n');
         _.forEach(b.p, function (p) {
+            var className = 'slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2';
+            if (view) {
+                className = 'slds-col--padded slds-size--1-of-2 slds-medium-size--1-of-3 slds-m-top--medium';
+            }
             s0.push('\
-<div className="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2">\n');
+<div className="'+ className + '">\n');
             _.forEach(p, function (v) {
-                self.buildElement(s, v.f, v.o);
+                if (view) {
+                    self.buildViewField(s, v.f, v.o);
+                } else {
+                    self.buildInputField(s, v.f, v.o);
+                }
             });
             s0.push('\
 </div>\n');
@@ -54,8 +62,42 @@ Theme.prototype.buildLayout = function buildLayout(s, pack) {
     });
 };
 
-Theme.prototype.buildElement = function buildElement(s, prop, opt) {
-    var propName = prop.name;
+Theme.prototype.buildViewField = function buildViewField(s, prop, opt) {
+    var propName = prop.id;
+    if (!propName) {
+        this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + ': { field.name: }') + ' not defined')); return false;
+    }
+
+    // build content
+    var s0 = s[0];
+    var _hasOwnProperty = function (name) { return prop.hasOwnProperty(name); };
+    if (_.some(['lookup', 'masterDetail'], _hasOwnProperty)) {
+        s0.push('\
+<dl className="page-header--rec-home__detail-item">\n\
+    <dt>\n\
+        <p className="slds-text-heading--label slds-truncate" title="' + encodeURI(prop.label) + '">' + this.escapeForXML(prop.label) + '</p>\n\
+    </dt>\n\
+    <dd>\n\
+        <p className="slds-text-body--regular slds-truncate" title="">{this.props.entity.'+ propName + '}</p>\n\
+    </dd>\n\
+</dl>\n');
+    } else {
+        s0.push('\
+<dl className="page-header--rec-home__detail-item">\n\
+    <dt>\n\
+        <p className="slds-text-heading--label slds-truncate" title="' + encodeURI(prop.label) + '">' + this.escapeForXML(prop.label) + '</p>\n\
+    </dt>\n\
+    <dd>\n\
+        <p className="slds-text-body--regular slds-truncate" title="">{this.props.entity.'+ propName + '}</p>\n\
+    </dd>\n\
+</dl>\n');
+    }
+    return true;
+};
+
+
+Theme.prototype.buildInputField = function buildInputField(s, prop, opt) {
+    var propName = prop.id;
     if (!propName) {
         this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + ': { field.name: }') + ' not defined')); return false;
     }
@@ -264,217 +306,4 @@ Theme.prototype.buildElement = function buildElement(s, prop, opt) {
         this.log(chalk.bold('ERR! ' + chalk.green(this.entityName + '.' + propName + ': { field.prop: }') + ' not matched')); return false;
     }
     return true;
-};
-
-Theme.prototype.buildHeader = function buildHeader(s, body) {
-    var s0 = s[0];
-    s0.push(function (selector, $) {
-        $(selector).append('\
-<div class="slds">\n\
-    <div class="slds" style="margin-top:10px;margin-left:10px;">\n');
-    });
-    body(s);
-    s0.push(function (selector, $) {
-        $(selector).append('\
-    </div>\n\
-</div>\n');
-    });
-};
-
-Theme.prototype.buildDetailHeader = function buildDetailHeader(s) {
-    var s0 = s[0];
-    s0.push(function (selector, $) {
-        $(selector).append('\
-    <div class="slds-page-header" role="banner">\n\
-    <div class="slds-grid">\n\
-        <div class="slds-col slds-has-flexi-truncate">\n\
-            <div class="slds-media">\n\
-                <div class="slds-media__figure">\n\
-                    <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">\n\
-                        <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#user"></use>\n\
-                    </svg>\n\
-                </div>\n\
-                <div class="slds-media__body">\n\
-                    <p class="slds-text-heading--label">Record Type</p>\n\
-                    <div class="slds-grid">\n\
-                        <h1 class="slds-page-header__title slds-m-right--small slds-truncate slds-align-middle" title="Record Title">Record Title</h1>\n\
-                        <div class="slds-col slds-shrink-none">\n\
-                            <button class="slds-button slds-button--neutral slds-not-selected" aria-live="assertive">\n\
-                                <span class="slds-text-not-selected">\n\
-                                    <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">\n\
-                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#add"></use>\n\
-                                    </svg>Follow\n\
-                                </span>\n\
-                                <span class="slds-text-selected">\n\
-                                    <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">\n\
-                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#check"></use>\n\
-                                    </svg>Following\n\
-                                </span>\n\
-                                <span class="slds-text-selected-focus">\n\
-                                    <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">\n\
-                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>\n\
-                                    </svg>Unfollow\n\
-                                </span>\n\
-                            </button>\n\
-                        </div>\n\
-                    </div>\n\
-                </div>\n\
-            </div>\n\
-        </div>\n\
-        <div class="slds-col slds-no-flex slds-align-bottom">\n\
-            <div class="slds-button-group" role="group">\n\
-                <button class="slds-button slds-button--neutral">Edit</button>\n\
-                <button class="slds-button slds-button--neutral">Delete</button>\n\
-                <button class="slds-button slds-button--neutral">Clone</button>\n\
-                <div class="slds-button--last">\n\
-                    <button class="slds-button slds-button--icon-border-filled">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">More</span>\n\
-                    </button>\n\
-                </div>\n\
-            </div>\n\
-        </div>\n\
-    </div>\n\
-    <div class="slds-grid slds-page-header__detail-row">\n\
-        <div class="slds-col--padded slds-size--1-of-4">\n\
-            <dl>\n\
-                <dt>\n\
-                    <p class="slds-text-heading--label slds-truncate" title="Field 1">Field 1</p>\n\
-                </dt>\n\
-                <dd>\n\
-                    <p class="slds-text-body--regular slds-truncate" title="Description that demonstrates truncation with a long text field">Description that demonstrates truncation with a long text field</p>\n\
-                </dd>\n\
-            </dl>\n\
-        </div>\n\
-        <div class="slds-col--padded slds-size--1-of-4">\n\
-            <dl>\n\
-                <dt>\n\
-                    <p class="slds-text-heading--label slds-truncate" title="Field2 (3)">\n\
-                        Field 2 (3)\n\
-                        <button class="slds-button slds-button--icon-bare">\n\
-                            <svg aria-hidden="true" class="slds-button__icon slds-button__icon--small">\n\
-                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                            </svg>\n\
-                            <span class="slds-assistive-text">More Actions</span>\n\
-                        </button>\n\
-                    </p>\n\
-                </dt>\n\
-                <dd>\n\
-                    <p class="slds-text-body--regular">Multiple Values</p>\n\
-                </dd>\n\
-            </dl>\n\
-        </div>\n\
-        <div class="slds-col--padded slds-size--1-of-4">\n\
-            <dl>\n\
-                <dt>\n\
-                    <p class="slds-text-heading--label slds-truncate" title="Field 3">Field 3</p>\n\
-                </dt>\n\
-                <dd>\n\
-                    <a href="javascript:void(0)">Hyperlink</a>\n\
-                </dd>\n\
-            </dl>\n\
-        </div>\n\
-        <div class="slds-col--padded slds-size--1-of-4">\n\
-            <dl>\n\
-                <dt>\n\
-                    <p class="slds-text-heading--label slds-truncate" title="Field 4">Field 4</p>\n\
-                </dt>\n\
-                <dd>\n\
-                    <p>\n\
-                        <span>Description (2-line truncat...</span>\n\
-                    </p>\n\
-                </dd>\n\
-            </dl>\n\
-        </div>\n\
-    </div>\n\
-</div>\n');
-    });
-};
-
-Theme.prototype.buildListHeader = function buildListHeader(s) {
-    var s0 = s[0];
-    s0.push(function (selector, $) {
-        $(selector).append('\
-<div class="slds-page-header" role="banner">\n\
-    <div class="slds-grid">\n\
-        <div class="slds-col slds-has-flexi-truncate">\n\
-            <p class="slds-text-heading--label">Leads</p>\n\
-            <div class="slds-grid">\n\
-                <div class="slds-grid slds-type-focus slds-no-space">\n\
-                    <h1 class="slds-text-heading--medium slds-truncate" title="My Leads (truncates)">My Leads (truncates)</h1>\n\
-                    <button class="slds-button slds-button--icon-bare slds-shrink-none slds-align-middle slds-m-left--x-small">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">View More</span>\n\
-                    </button>\n\
-                </div>\n\
-                <button class="slds-button slds-button--icon-more slds-shrink-none slds-m-left--large" aria-haspopup="true">\n\
-                    <svg aria-hidden="true" class="slds-button__icon">\n\
-                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#settings"></use>\n\
-                    </svg>\n\
-                    <span class="slds-assistive-text">Settings</span>\n\
-                    <svg aria-hidden="true" class="slds-button__icon slds-button__icon--x-small">\n\
-                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                    </svg>\n\
-                </button>\n\
-                <button class="slds-button slds-button--brand slds-button-space-left slds-m-right--medium slds-shrink-none slds-align-middle slds-hide" aria-hidden="true">Save</button>\n\
-            </div>\n\
-        </div>\n\
-        <div class="slds-col slds-no-flex slds-align-bottom">\n\
-            <div class="slds-grid">\n\
-                <div class="slds-button-space-left">\n\
-                    <button class="slds-button slds-button--icon-more" aria-haspopup="true">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#table"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">Table</span>\n\
-                        <svg aria-hidden="true" class="slds-button__icon slds-button__icon--x-small">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                        </svg>\n\
-                    </button>\n\
-                </div>\n\
-                <div class="slds-button-group slds-button-space-left" role="group">\n\
-                    <button class="slds-button slds-button--icon-border slds-not-selected">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#chart"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">Chart</span>\n\
-                    </button>\n\
-                    <button class="slds-button slds-button--icon-border slds-not-selected">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#filterList"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">Filter List</span>\n\
-                    </button>\n\
-                    <button class="slds-button slds-button--icon-more">\n\
-                        <svg aria-hidden="true" class="slds-button__icon">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#sort"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">Sort</span>\n\
-                        <svg aria-hidden="true" class="slds-button__icon slds-button__icon--x-small">\n\
-                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                        </svg>\n\
-                        <span class="slds-assistive-text">More</span>\n\
-                    </button>\n\
-                </div>\n\
-                <div class="slds-button-group" role="group">\n\
-                    <button class="slds-button slds-button--neutral">New Lead</button>\n\
-                    <div class="slds-button--last">\n\
-                        <button class="slds-button slds-button--icon-border-filled">\n\
-                            <svg aria-hidden="true" class="slds-button__icon">\n\
-                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>\n\
-                            </svg>\n\
-                            <span class="slds-assistive-text">More Actions</span>\n\
-                        </button>\n\
-                    </div>\n\
-                </div>\n\
-            </div>\n\
-        </div>\n\
-    </div>\n\
-    <p class="slds-text-body--small slds-m-top--x-small">10 items • Sorted by Name</p>\n\
-</div>\n');
-    });
 };

@@ -14,7 +14,9 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's');
 }
 
 function build(s, theme, ctx) {
@@ -27,7 +29,7 @@ function build(s, theme, ctx) {
             return;
         }
         var h = [[]];
-        theme.buildLayout(h, layout.pack);
+        theme.buildLayout(h, false, layout.pack);
         var layoutHtml = h[0].join('');
         // console.log(layoutHtml);
         var render = 'return (\n\
@@ -44,12 +46,12 @@ import LinkedStateMixin from 'react-addons-linked-state-mixin';\n\
 export default React.createClass({\n\
     mixins: [LinkedStateMixin],\n\
     getInitialState() {\n\
-        let property = this.props.property;\n\
-        " + $.verbatim('return {...property};') + "\n\
+        let entity = this.props.entity;\n\
+        " + $.verbatim('return {...entity};') + "\n\
     },\n\
     componentWillReceiveProps(props) {\n\
-        let property = props.property;\n\
-        " + $.verbatim('this.setState({...property});') + "\n\
+        let entity = props.entity;\n\
+        " + $.verbatim('this.setState({...entity});') + "\n\
     },\n\
     save() {\n\
         this.props.saveHandler(this.state);\n\

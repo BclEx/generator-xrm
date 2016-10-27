@@ -16,7 +16,9 @@ var helpers = require('../helpers');
 
 function q(s, ctx, a0, a1, a2) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/'/g, '"')
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/'/g, '"')
         .replace(/\$\{0\}/g, a0).replace(/\$\{1\}/g, a1).replace(/\$\{2\}/g, a2);
 }
 

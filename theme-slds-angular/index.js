@@ -11,7 +11,7 @@
 
 // External libs.
 var util = require('util');
-var themeBase = require('../theme-base.js');
+var themeBase = require('../theme-base');
 var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');
 var _ = require('lodash');

@@ -14,7 +14,10 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's')
+        .replace(/\$\{id\}/g, ctx.id);
 }
 
 function build(s, theme, ctx) {
@@ -22,18 +25,19 @@ function build(s, theme, ctx) {
     var t0 = s[0];
     t0.push(function (selector, $) {
         var render = 'return (\n\
-<div>\n\
-    <RecordHeader type="Property" icon="account" title={this.state.property.address}\n\
+<section className="stage" style={{top:\'90px\',height:\'calc(100% - 90px)\',width:\'100%\'}}>\n\
+    <RecordHeader type="Entity" icon="account" title={this.state.entity.name}\n\
         onEdit={this.editHandler}\n\
         onDelete={this.deleteHandler}\n\
         onClone={this.cloneHandler}>\n\
-        <HeaderField label="City" value={this.state.property.city}/>\n\
-        <HeaderField label="Type" value="Single Family"/>\n\
         <HeaderField label="Date Listed" value="Aug 1st 2015"/>\n\
-        <HeaderField label="Asking Price" value={this.state.property.price} format="currency"/>\n\
     </RecordHeader>\n\
-    {React.cloneElement(this.props.children, { property: this.state.property, saveHandler: this.saveHandler})}\n\
-</div>)';
+    {React.cloneElement(this.props.children, { entity: this.state.entity, saveHandler: this.saveHandler})}\n\
+</section>)';
+// <HeaderField label="City" value={this.state.entity.city}/>\n\
+// <HeaderField label="Type" value="Single Family"/>\n\
+// <HeaderField label="Date Listed" value="Aug 1st 2015"/>\n\
+// <HeaderField label="Asking Price" value={this.state.entity.price} format="currency"/>\n\
         $.body.append(q("\
 import React from 'react';\n\
 import {Router} from 'react-router';\n\
@@ -41,23 +45,26 @@ import * as ${name}Service from '../_services/${Name}Service';\n\
 import {RecordHeader, HeaderField} from '../_components/PageHeader';\n\
 export default React.createClass({\n\
     getInitialState() {\n\
-        return { property: {} };\n\
+        return { entity: {} };\n\
     },\n\
     componentDidMount() {\n\
-        propertyService.findById(this.props.params.propertyId).then(x => this.setState({x}));\n\
+        let id = this.props.params.${id};\n\
+        ${name}Service.findById(id).then(entity => this.setState({entity}));\n\
     },\n\
-    saveHandler(property) {\n\
-        propertyService.updateItem(property).then(() => {\n\
-            console.log('property saved');\n\
+    saveHandler(entity) {\n\
+        ${name}Service.updateItem(entity).then(() => {\n\
+            console.log('entity saved');\n\
         });\n\
     },\n\
     editHandler() {\n\
-        window.location.hash = '#property/' + this.state.property.property_id + '/edit';\n\
+        window.location.hash = '#${name}/' + this.state.entity.${id} + '/edit';\n\
     },\n\
     deleteHandler() {\n\
-        propertyService.deleteItem(this.state.property.property_id).then(() => {\n\
-            window.location.hash = '#';\n\
+        ${name}Service.deleteItem(this.state.entity.${id}).then(() => {\n\
+            window.location.hash = '#${names}';\n\
         });\n\
+    },\n\
+    cloneHandler() {\n\
     },\n\
     render() {" + $.verbatim(q(render, ctx)) + "}\n\
 });", ctx));

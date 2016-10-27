@@ -10,7 +10,7 @@
 
 // External libs.
 var util = require('util');
-var scriptBase = require('../script-base.js');
+var scriptBase = require('../script-base');
 var yeoman = require('yeoman-generator');
 var debug = require('debug')('generator:xrm-core');
 var chalk = require('chalk');

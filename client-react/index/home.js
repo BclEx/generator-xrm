@@ -14,7 +14,10 @@ var _ = require('lodash');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's')
+        .replace(/\$\{id\}/g, ctx.id);
 }
 
 function build(s, theme, ctx) {
@@ -22,7 +25,7 @@ function build(s, theme, ctx) {
     var t0 = s[0];
     t0.push(function (selector, $) {
         var render = 'return (\n\
-<div>\n\
+<section className="stage" style={{top:\'90px\',height:\'calc(100% - 90px)\',width:\'100%\'}}>\n\
     <HomeHeader type="${names}"\n\
                 title="My ${Name}"\n\
                 newLabel="New ${Name}"\n\
@@ -35,7 +38,7 @@ function build(s, theme, ctx) {
                 onViewChange={this.viewChangeHandler}/>\n\
     <${Name}List ${names}={this.state.${names}} onSort={this.sortHandler} onDelete={this.deleteHandler} onEdit={this.editHandler}/>\n\
     {this.state.adding ? <New${Name}Window onSave={this.saveHandler} onCancel={this.cancelHandler}/> : ""}\n\
-</div>)';
+</section>)';
         $.body.append(q("\
 import React from 'react';\n\
 import * as ${name}Service from '../_services/${Name}Service';\n\
@@ -57,19 +60,19 @@ export default React.createClass({\n\
     newHandler() {\n\
         this.setState({adding: true});\n\
     },\n\
-    deleteHandler(data) {\n\
-        ${name}Service.deleteItem(data.id).then(() => {\n\
+    deleteHandler(entity) {\n\
+        ${name}Service.deleteItem(entity.${id}).then(() => {\n\
             ${name}Service.findAll(this.state.sort).then(${names} => this.setState({${names}}));\n\
         });\n\
     },\n\
-    editHandler(data) {\n\
-        window.location.hash = '#${name}/' + data.id + '/edit\';\n\
+    editHandler(entity) {\n\
+        window.location.hash = '#${name}/' + entity.${id} + '/edit\';\n\
     },\n\
     viewChangeHandler(value) {\n\
         this.setState({view: value});\n\
     },\n\
-    saveHandler(data) {\n\
-        ${name}Service.createItem(data).then(() => {\n\
+    saveHandler(entity) {\n\
+        ${name}Service.createItem(entity).then(() => {\n\
             ${name}Service.findAll(this.state.sort).then(${names} => this.setState({adding: false, ${names}}));\n\
         });\n\
     },\n\

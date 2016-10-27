@@ -16,7 +16,9 @@ var helpers = require('../helpers');
 
 function q(s, ctx, a0, a1, a2) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/'/g, '"')
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/'/g, '"')
         .replace(/\$\{0\}/g, a0).replace(/\$\{1\}/g, a1).replace(/\$\{2\}/g, a2);
 }
 
@@ -39,16 +41,22 @@ function build(s, ctx, database) {
             ctx.missingField(key, 'aspnet-repository');
             return;
         }
-        elms1.push(field.Id + ' as ' + field.name);
+        elms1.push(field.Id); // + ' as ' + field.name);
+        if (field.relate) {
+            elms1.push(field.Id + 'Name');
+        }
     });
-    var getAllSql = $.select(elms1).from(ctxName).toQuery();
+    var getAllSql = $.select(elms1).from(ctxName + 'View').toQuery();
 
     // getByIdSql
     var elms2 = [ctx.Id];
     _.forEach(ctx.getFields(3), function (field) {
-        elms2.push(field.Id + ' as ' + field.name);
+        elms2.push(field.Id); // + ' as ' + field.name);
+        if (field.relate) {
+            elms2.push(field.Id + 'Name');
+        }
     });
-    var getByIdSql = $.select(elms2).from(ctxName).whereRaw(ctxName + 'Id = @' + ctxName + 'Id').toQuery();
+    var getByIdSql = $.select(elms2).from(ctxName + 'View').whereRaw(ctxName + 'Id = @' + ctxName + 'Id').toQuery();
 
     t0.push(function (selector, $) {
         $.body.append(q("\

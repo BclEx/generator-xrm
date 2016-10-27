@@ -16,7 +16,10 @@ var chalk = require('chalk');
 
 function q(s, ctx) {
     var camelCase = _.camelCase(ctx.name);
-    return s.replace(/\$\{Name\}/g, ctx.name).replace(/\$\{name\}/g, camelCase).replace(/\$\{names\}/g, camelCase + 's');
+    return s.replace(/\$\{Name\}/g, ctx.name)
+        .replace(/\$\{name\}/g, camelCase)
+        .replace(/\$\{names\}/g, camelCase + 's')
+        .replace(/\$\{id\}/g, ctx.id);
 }
 
 function build(s, theme, ctx) {
@@ -29,15 +32,22 @@ function build(s, theme, ctx) {
             ctx.missingList('Main', 'react-list');
             return;
         }
-        _.forOwn(list.l, function (value, key) {
+        _.forOwn(list.l, function (layout, key) {
             var field = ctx.fields[key];
             if (!field) {
                 ctx.missingField(key, 'react-list');
                 return;
             }
-            value.header = field.label;
-            value.field = field.id;
-            elms.push({ div: { _attr: value } });
+            var layout2 = _.assign(layout, field.defaultLayout);
+            layout2.header = field.label;
+            layout2.field = (!field.relate ? field.id : field.id + 'Name');
+            if (layout2.sortable) {
+                layout2.sortable = '{true}';
+            }
+            if (field.primary) {
+                layout2.onLink = '{this.linkHandler}';
+            }
+            elms.push({ div: { _attr: layout2 } });
         });
         elms.push({ _attr: { data: '{this.props.${names}}', keyField: ctx.id, onSort: '{this.props.onSort}', onAction: '{this.actionHandler}' } });
         var render = 'return (\n\
@@ -54,8 +64,8 @@ function build(s, theme, ctx) {
 import React from 'react';\n\
 import DataGrid from '../_components/DataGrid';\n\
 export default React.createClass({\n\
-    linkHandler(data) {\n\
-        window.location.hash = '#${name}/' + data.id;\n\
+    linkHandler(entity) {\n\
+        window.location.hash = '#${name}/' + entity.${id};\n\
     },\n\
     actionHandler(data, value, label) {\n\
         if (label === 'Delete') {\n\

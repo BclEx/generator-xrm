@@ -44,9 +44,11 @@ function build(ctx, usings) {
         } else if (x.hasOwnProperty('lookup')) {
             usingSystem = true;
             t.push({ guid: { name: x.Id }, attribute: [{ DisplayName: label }] });
+            t.push({ string: { name: x.Id + 'Name' }, attribute: [{ DisplayName: label }] });
         } else if (x.hasOwnProperty('masterDetail')) {
             usingSystem = true;
             t.push({ guid: { name: x.Id }, attribute: [{ DisplayName: label }] });
+            t.push({ string: { name: x.Id + 'Name' }, attribute: [{ DisplayName: label }] });
         } else if (x.hasOwnProperty('externalLookup')) {
             t.push({ string: { name: x.Id }, attribute: [{ DisplayName: label }] });
         } else if (x.hasOwnProperty('checkbox')) {
