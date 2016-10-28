@@ -1,6 +1,6 @@
 {
   "name": "generator-xrm-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A Yeoman generator for xrm",
   "license": "MIT",
   "main": "app/index.js",
@@ -19,18 +19,31 @@
     "test": "grunt test"
   },
   "files": [
-    "app"
+    "app",
+    "client-angular",
+    "client-react",
+    "database",
+    "server-aspnet",
+    "template",
+    "theme-plain",
+    "theme-slds-angular",
+    "theme-slds-react",
+    "jsx.js",
+    "script-base.js",
+    "theme-base.js",
+    "util.js",
+    "xrm-parse.js"
   ],
   "keywords": [
     "yeoman-generator"
   ],
   "dependencies": {
     "chalk": "^1.1.3",
-    "generator-fragment": "^0.1.3",
-    "lodash": "^4.15.0",
+    "generator-fragment": "^0.1.4",
+    "lodash": "^4.16.4",
     "yeoman-generator": "^0.24.1",
     "yeoman-test": "^1.5.1",
-    "yosay": "^1.2.0"
+    "yosay": "^1.2.1"
   },
   "devDependencies": {
     "bluebird": "^3.4.3",
