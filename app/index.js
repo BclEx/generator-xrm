@@ -32,16 +32,17 @@ Generator.prototype.createFiles = function createFiles() {
 	var database = this.options.database || 'mssql';
 	var client = this.options.client || 'react';
 	var server = this.options.server || 'aspnet';
+	var template = this.options.template || { serverAspnet: null };
 	var dest = this.options.dest || { database: null, html: null, js: null, css: null, server: null };
 	var searchPaths = this.options.searchPaths || [];
 	var ctx = this.getCtx(this.options.ctx || this.ctx);
 	if (database !== 'none') {
-		this.composeWith('xrm-core:database', { options: { database: database, location: new Location(dest.database), ctx: ctx, searchPaths: searchPaths } });
+		this.composeWith('xrm-core:database', { options: { database: database, dest: new Location(dest.database), ctx: ctx, searchPaths: searchPaths } });
 	}
 	if (client !== 'none') {
-		this.composeWith('xrm-core:client-' + client, { options: { location: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: ctx, searchPaths: searchPaths } });
+		this.composeWith('xrm-core:client-' + client, { options: { dest: { html: new Location(dest.html), js: new Location(dest.js), css: new Location(dest.css) }, ctx: ctx, searchPaths: searchPaths } });
 	}
 	if (server !== 'none') {
-		this.composeWith('xrm-core:server-' + server, { options: { location: { api: new Location(dest.api), server: new Location(dest.server) }, ctx: ctx, searchPaths: searchPaths } });
+		this.composeWith('xrm-core:server-' + server, { options: { template: new Location(template.serverAspnet), dest: { api: new Location(dest.api), server: new Location(dest.server) }, ctx: ctx, searchPaths: searchPaths } });
 	}
 };

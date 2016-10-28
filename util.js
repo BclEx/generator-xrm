@@ -72,6 +72,10 @@ var Location = function Location(root) {
   this._root = root || '.';
 };
 
+Location.prototype.setDefaultRoot = function (root) {
+  this._defaultRoot = root || '.';
+}
+
 Location.prototype.getEnsuredPath = function (subPath, file) {
   var newPath = path.join(this._root, subPath);
   if (!fs.existsSync(newPath)) {
@@ -86,6 +90,15 @@ Location.prototype.getEnsuredPath = function (subPath, file) {
     }
   }
   return path.join(newPath, file);
+};
+
+Location.prototype.getTemplatePath = function (file) {
+  var newPath = path.join(this._root, file);
+  if (!fs.existsSync(newPath)) {
+    newPath = path.join(this._defaultRoot, file);
+    // console.log(['b:', newPath]);
+  }
+  return newPath;
 };
 
 module.exports = {

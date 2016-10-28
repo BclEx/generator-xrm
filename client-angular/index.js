@@ -41,13 +41,13 @@ Generator.prototype.createFiles = function createFiles() {
     var theme = new Theme(entityName, this.log);
     //theme.buildAllElements(s, fields);
 
-    var location = this.location || { html: null, js: null, css: null };
-    var locationHtml = location.html || new Location();
-    var locationJs = location.js || new Location();
-    var locationCss = location.css || new Location();
+    var dest = this.options.dest || { html: null, js: null, css: null };
+    var destHtml = dest.html || new Location();
+    var destJs = dest.js || new Location();
+    var destCss = dest.css || new Location();
     var htmlCtx = {
         _name: entityName,
-        _file: locationHtml.getEnsuredPath(entityName, entityName + '-entry.cshtml'),
+        _file: destHtml.getEnsuredPath(entityName, entityName + '-entry.cshtml'),
         // html: function (args, $) {
         //     var form = $('html');
         //     $('html').append(form);
@@ -57,12 +57,12 @@ Generator.prototype.createFiles = function createFiles() {
     };
     var jsCtx = {
         _name: entityName,
-        _file: locationJs.getEnsuredPath('src/modules', entityName + 'Module.js'),
+        _file: destJs.getEnsuredPath('src/modules', entityName + 'Module.js'),
         js: {}
     };
     var cssCtx = {
         _name: entityName,
-        _file: locationCss.getEnsuredPath('css/partials', '_' + entityName + '-entry.scss'),
+        _file: destCss.getEnsuredPath('css/partials', '_' + entityName + '-entry.scss'),
         css: {}
     };
     //console.log(htmlCtx);

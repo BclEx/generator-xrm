@@ -20,12 +20,14 @@ function getObjectNameParts(objectName) {
 var Generator = module.exports = function Generator() {
   //debug(this._moduleName, arguments);
   var ctx = {};
-  var location = null;
+  //var template = null;
+  //var dest = null;
   var a = arguments[0];
   if (typeof a[0] === 'undefined') {
     a = arguments[1];
     ctx = a.ctx || {};
-    location = a.location;
+    // template = a.template;
+    // dest = a.dest;
     debug(this._moduleName + ' from parent: ' + ctx.name);
   } else if (typeof a[0] !== 'string') {
     ctx = a[0] || {};
@@ -45,7 +47,8 @@ var Generator = module.exports = function Generator() {
   }
   yeoman.Base.apply(this, arguments);
   this.ctx = ctx;
-  this.location = location;
+  //this.template = template;
+  //this.dest = dest;
   var self = this;
   this.getCtx = function (ctx) {
     if (!ctx.Id) {

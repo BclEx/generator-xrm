@@ -9,6 +9,7 @@
 'use strict';
 
 // External libs.
+var path = require('path');
 var util = require('util');
 var scriptBase = require('../script-base');
 var yeoman = require('yeoman-generator');
@@ -39,37 +40,39 @@ Generator.prototype.createFiles = function createFiles() {
   var schemaName = 'CORE.Site';
 
   // build content
-  var location = this.location || { api: null, server: null };
-  var locationApi = location.api || new Location();
-  // var locationServer = location.server || new Location();
+  var template = this.options.template || new Location();
+  template.setDefaultRoot();
+  var dest = this.options.dest || { api: null, server: null };
+  var destApi = dest.api || new Location();
+  // var destServer = dest.server || new Location();
   var s0 = [];
-  Controller.build.call(this, s0, ctx);
+  Controller.build.call(this, s0, template, ctx);
   var csCtx = {
     _name: ctxName,
-    _file: locationApi.getEnsuredPath('Controllers', ctxName + 'Controller.cs'),
+    _file: destApi.getEnsuredPath('Controllers', ctxName + 'Controller.cs'),
     controller: { append: s0 }
   };
   var children = csCtx._children = [];
   var usings = [];
-  var s1 = Model.build.call(this, ctx, usings);
+  var s1 = Model.build.call(this, template, ctx, usings);
   children.push({
     _name: ctxName,
-    _file: locationApi.getEnsuredPath('Models', ctxName + 'Model.cs'),
+    _file: destApi.getEnsuredPath('Models', ctxName + 'Model.cs'),
     model: { usings: usings, schemaName: schemaName, createClass: ctxName + 'Model', t: s1 }
   });
   var s2 = [];
   var database = this.options.database || 'mssql';
-  Repository.build.call(this, s2, ctx, database);
+  Repository.build.call(this, s2, template, ctx, database);
   children.push({
     _name: ctxName,
-    _file: locationApi.getEnsuredPath('Repositories', ctxName + 'Repository.cs'),
+    _file: destApi.getEnsuredPath('Repositories', ctxName + 'Repository.cs'),
     repository: { append: s2 }
   });
   var s3 = [];
-  ServiceRepository.build.call(this, s3, ctx, database);
+  ServiceRepository.build.call(this, s3, template, ctx, database);
   children.push({
     _name: ctxName,
-    _file: locationApi.getEnsuredPath('Repositories', ctxName + 'ServiceRepository.cs'),
+    _file: destApi.getEnsuredPath('Repositories', ctxName + 'ServiceRepository.cs'),
     repository: { append: s3 }
   });
 

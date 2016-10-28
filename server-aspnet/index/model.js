@@ -13,7 +13,7 @@
 var chalk = require('chalk');
 var _ = require('lodash');
 
-function build(ctx, usings) {
+function build(template, ctx, usings) {
     // jshint validthis:true
     var ctxName = ctx.name;
 

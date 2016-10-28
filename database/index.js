@@ -40,11 +40,11 @@ Generator.prototype.createFiles = function createFiles() {
   var schemaFolder = schemaName || 'dbo';
 
   // build content
-  var location = this.location || new Location();
+  var dest = this.options.dest || new Location();
   var s0 = Table.build.call(this, database, ctx);
   var sqlCtx = {
     _name: ctxName,
-    _file: location.getEnsuredPath(schemaFolder + '/Tables', ctxName + '.sql'),
+    _file: dest.getEnsuredPath(schemaFolder + '/Tables', ctxName + '.sql'),
     _client: database,
     createTable: { schemaName: schemaName, createTable: ctxName, t: s0 }
   };
@@ -55,7 +55,7 @@ Generator.prototype.createFiles = function createFiles() {
       var s1 = Relation.build.call(this, database, ctx, x);
       children.push({
         _name: ctxName + '_' + name,
-        _file: location.getEnsuredPath(schemaFolder + '/Tables', ctxName + '_' + name + '.sql'),
+        _file: dest.getEnsuredPath(schemaFolder + '/Tables', ctxName + '_' + name + '.sql'),
         createTable: { schemaName: schemaName, createTable: ctxName + '_' + name, t: s1 }
       });
     });
@@ -63,7 +63,7 @@ Generator.prototype.createFiles = function createFiles() {
   var s2 = View.build.call(this, database, ctx, schemaName);
   children.push({
     _name: ctxName + 'View',
-    _file: location.getEnsuredPath(schemaFolder + '/Views', ctxName + 'View.sql'),
+    _file: dest.getEnsuredPath(schemaFolder + '/Views', ctxName + 'View.sql'),
     createTable: { schemaName: schemaName, createView: ctxName + 'View', t: s2 }
   });
   // console.log(sqlCtx);
